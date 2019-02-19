@@ -2,8 +2,11 @@ package com.github.vasiliz.vkclient;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    private TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void init() {
+
+        mTextView = findViewById();
 
         //init all views here
     }
