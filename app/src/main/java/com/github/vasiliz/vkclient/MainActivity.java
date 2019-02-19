@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
 
         mTextView = findViewById(R.id.all);
-
+        //add chenges for chery pick
         //init all views here
     }
 }
