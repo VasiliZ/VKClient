@@ -1,0 +1,3 @@
+[submodule "MyImageLoader"]
+	path = MyImageLoader
+	url = https://github.com/VasiliZ/MyImageLoader
