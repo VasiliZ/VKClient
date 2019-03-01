@@ -1,5 +1,6 @@
 package com.github.vasiliz.vkclient.login;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +11,7 @@ import android.webkit.WebView;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.github.vasiliz.vkclient.R;
 import com.github.vasiliz.vkclient.base.utils.StringUtils;
+import com.github.vasiliz.vkclient.main.ui.VkMainActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -21,7 +23,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mSharedPreferences = getSharedPreferences(ConstantStrings.Preferences.ACCESS_TOKEN_PREFERENCE, MODE_PRIVATE);
-
         if (checkLogin()) {
             goToMainScreen();
         } else {
@@ -30,10 +31,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToMainScreen() {
+        final Intent intent = new Intent(this, VkMainActivity.class);
+        startActivity(intent);
+
     }
 
     private void init() {
-
         final WebView webView = findViewById(R.id.login_web_view);
         webView.loadUrl(ConstantStrings.ApiVK.BASE_URL + ConstantStrings.ApiVK.LOGIN_VK_REQUEST);
         webView.setWebViewClient(new LoginWebView(this));
@@ -45,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         if (token != null) {
             editor.putString(ConstantStrings.ApiVK.TOKEN_NAME, token);
             editor.apply();
+            goToMainScreen();
             Log.d(TAG, "saveToken: " + token);
         }
     }

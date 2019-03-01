@@ -7,7 +7,7 @@ import android.view.View;
 
 public abstract class VkActivity extends AppCompatActivity implements VkBaseView {
 
-    private VkPresenter<? super VkBaseView> mVkPresenter;
+     private VkPresenter<? super VkBaseView> mVkPresenter;
 
 
     @Override
@@ -15,11 +15,6 @@ public abstract class VkActivity extends AppCompatActivity implements VkBaseView
         super.onCreate(savedInstanceState);
         mVkPresenter = initPresenter();
         mVkPresenter.attachView(this);
-    }
-
-    @Override
-    public void setContentView(final int layoutResID) {
-        super.setContentView(layoutResID);
     }
 
     @Override
@@ -36,7 +31,7 @@ public abstract class VkActivity extends AppCompatActivity implements VkBaseView
         }
     }
 
-    protected abstract VkPresenter<VkBaseView> initPresenter();
+    protected abstract VkPresenter initPresenter();
 
     @Override
     protected void onResume() {
@@ -52,8 +47,9 @@ public abstract class VkActivity extends AppCompatActivity implements VkBaseView
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         mVkPresenter.detachView();
+        super.onDestroy();
+
     }
 
     public boolean isVisible(final View pView) {
