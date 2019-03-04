@@ -4,4 +4,8 @@ import com.github.vasiliz.vkclient.mymvp.VkBaseView;
 
 public interface IMainView extends VkBaseView {
 
+    void showProgress();
+
+    void hideProgress();
+
 }

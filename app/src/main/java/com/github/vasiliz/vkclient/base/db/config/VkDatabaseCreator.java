@@ -1,4 +1,4 @@
-package com.github.vasiliz.vkclient.base.db;
+package com.github.vasiliz.vkclient.base.db.config;
 
 import android.util.Log;
 
@@ -32,42 +32,36 @@ public class VkDatabaseCreator {
             final List<String> listSql = new ArrayList<String>();
             final StringBuilder stringBuilder = new StringBuilder();
             for (final Class aClass : mClasses) {
-
-                final String createTableSql =
-                        ConstantStrings.DB.CREATE_TABLE
-                                + aClass.getSimpleName();
-                stringBuilder.append(createTableSql);
+                stringBuilder
+                        .append(ConstantStrings.DB.CREATE_TABLE)
+                        .append(aClass.getSimpleName())
+                        .append(ConstantStrings.DB.OPEN_BRACKET);
                 final Field[] fields = aClass.getDeclaredFields();
                 for (final Field field : fields) {
                     final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
                     for (final Annotation annotation1 : declaredAnnotations) {
 
-                        if (annotation1 instanceof com.github.vasiliz.vkclient.base.db.Id) {
-                            final String idColumn =
-                                    ConstantStrings.DB.OPEN_BRACKET
-                                            + field.getName()
-                                            + ConstantStrings.DB.CREATE_ID_COLUMN;
-                            stringBuilder.append(idColumn);
-                        } else {
+                        if (annotation1 instanceof Id) {
+                            stringBuilder
+                                    .append(field.getName())
+                                    .append(ConstantStrings.DB.CREATE_ID_COLUMN);
+                        } else if (annotation1 instanceof com.github.vasiliz.vkclient.base.db.config.Field) {
                             if (field.getType().equals(String.class)) {
-                                final String createVarcharFields =
-                                        ConstantStrings.DB.COMMA
-                                                + field.getName()
-                                                + ConstantStrings.DB.Type.VARCHAR;
-                                stringBuilder.append(createVarcharFields);
+                                stringBuilder
+                                        .append(ConstantStrings.DB.COMMA)
+                                        .append(field.getName())
+                                        .append(ConstantStrings.DB.Type.TEXT);
                             } else if ((field.getType().equals(int.class))
                                     || (field.getType().equals(long.class))) {
-                                final String createIntFields =
-                                        ConstantStrings.DB.COMMA
-                                                + field.getName()
-                                                + ConstantStrings.DB.Type.INTEGER;
-                                stringBuilder.append(createIntFields);
+                                stringBuilder
+                                        .append(ConstantStrings.DB.COMMA)
+                                        .append(field.getName())
+                                        .append(ConstantStrings.DB.Type.INTEGER);
                             } else {
-                                final String objectField =
-                                        ConstantStrings.DB.COMMA
-                                                + field.getName()
-                                                + ConstantStrings.DB.Type.TEXT;
-                                stringBuilder.append(objectField);
+                                stringBuilder
+                                        .append(ConstantStrings.DB.COMMA)
+                                        .append(field.getName())
+                                        .append(ConstantStrings.DB.Type.TEXT);
                             }
                         }
                     }

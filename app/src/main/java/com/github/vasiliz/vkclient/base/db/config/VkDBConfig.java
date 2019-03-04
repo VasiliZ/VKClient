@@ -1,4 +1,4 @@
-package com.github.vasiliz.vkclient.base.db;
+package com.github.vasiliz.vkclient.base.db.config;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

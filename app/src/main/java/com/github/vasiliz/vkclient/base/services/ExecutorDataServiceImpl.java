@@ -4,17 +4,18 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public final class ExecutorDataServiceImpl implements IDataExecutorService {
 
     private static ExecutorDataServiceImpl mExecutorDataServiceImpl;
-    private final ScheduledThreadPoolExecutor mNetworkExecutor;
-    private ScheduledFuture<?> mScheduledFuture;
+    private final ThreadPoolExecutor mNetworkExecutor;
     private final Executor mDataBaseTask;
 
     private ExecutorDataServiceImpl() {
         mDataBaseTask = Executors.newSingleThreadExecutor();
-        mNetworkExecutor = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors());
+        mNetworkExecutor = (ThreadPoolExecutor)
+                Executors.newFixedThreadPool((int) (Runtime.getRuntime().availableProcessors()*1.5));
     }
 
     public static ExecutorDataServiceImpl getInstance() {
@@ -26,17 +27,13 @@ public final class ExecutorDataServiceImpl implements IDataExecutorService {
 
     @Override
     public <T> void doNetworkTask(final INetworkTask<T> pTask) {
-        mScheduledFuture = mNetworkExecutor.scheduleAtFixedRate(
-                new Runnable() {
+         mNetworkExecutor.execute(new Runnable() {
 
-                    @Override
-                    public void run() {
-                        pTask.runNetwork();
-                    }
-                },
-                0,
-                pTask.getPeriod(),
-                pTask.getTimeUnit());
+             @Override
+             public void run() {
+                 pTask.runNetwork();
+             }
+         });
     }
 
     @Override
@@ -60,13 +57,6 @@ public final class ExecutorDataServiceImpl implements IDataExecutorService {
             }
         });
 
-    }
-
-    @Override
-    public void cancelNetworkTask() {
-        if (mScheduledFuture != null) {
-            mScheduledFuture.cancel(true);
-        }
     }
 
 }

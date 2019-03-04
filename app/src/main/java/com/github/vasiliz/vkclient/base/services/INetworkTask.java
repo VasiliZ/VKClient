@@ -13,11 +13,4 @@ public interface INetworkTask<T> {
     @WorkerThread
     void runNetwork();
 
-    int getPeriod();
-
-    TimeUnit getTimeUnit();
-
-
-
-
 }

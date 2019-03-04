@@ -1,27 +1,17 @@
-package com.github.vasiliz.vkclient.base.db;
+package com.github.vasiliz.vkclient.base.db.config;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.github.vasiliz.vkclient.vkNews.entity.Attachment;
-import com.github.vasiliz.vkclient.vkNews.entity.Groups;
-import com.github.vasiliz.vkclient.vkNews.entity.Item;
-import com.github.vasiliz.vkclient.vkNews.entity.Profile;
-
 import java.util.List;
 
-@Database(databaseName = "mydbVk",
-        entity = {Profile.class,
-                Item.class,
-                Groups.class,
-                Attachment.class})
-public class AppDB extends SQLiteOpenHelper {
+public class DBHelper extends SQLiteOpenHelper {
 
     private VkDBConfig mVkDBConfig;
     private String mTableName;
     private List<String> mListOfQuery;
 
-    public AppDB(final VkDBConfig pVkDBConfig, final List<String> pListOfQuery) {
+    public DBHelper(final VkDBConfig pVkDBConfig, final List<String> pListOfQuery) {
         super(pVkDBConfig.getContext(), pVkDBConfig.getDbName(), pVkDBConfig.getCursorFactory(), pVkDBConfig.getVersion());
         mVkDBConfig = pVkDBConfig;
         mTableName = pVkDBConfig.getDbName();
@@ -41,3 +31,4 @@ public class AppDB extends SQLiteOpenHelper {
 
     }
 }
+

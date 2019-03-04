@@ -4,8 +4,8 @@ import android.view.View;
 
 public interface VkBaseView {
 
-    void showProgress(View pView);
+    void showProgress();
 
-    void hideProgress(View pView);
+    void hideProgress();
 
 }

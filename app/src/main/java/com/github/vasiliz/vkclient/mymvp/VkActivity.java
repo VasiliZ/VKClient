@@ -17,19 +17,6 @@ public abstract class VkActivity extends AppCompatActivity implements VkBaseView
         mVkPresenter.attachView(this);
     }
 
-    @Override
-    public void showProgress(final View pView) {
-        if (!isVisible(pView)) {
-            pView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void hideProgress(final View pView) {
-        if (isVisible(pView)) {
-            pView.setVisibility(View.GONE);
-        }
-    }
 
     protected abstract VkPresenter initPresenter();
 
@@ -53,6 +40,9 @@ public abstract class VkActivity extends AppCompatActivity implements VkBaseView
     }
 
     public boolean isVisible(final View pView) {
-        return pView.getVisibility() == View.VISIBLE;
+        if (pView!=null) {
+            return pView.getVisibility() == View.VISIBLE;
+        }
+        return false;
     }
 }

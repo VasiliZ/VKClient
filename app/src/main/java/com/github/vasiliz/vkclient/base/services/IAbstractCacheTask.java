@@ -3,8 +3,6 @@ package com.github.vasiliz.vkclient.base.services;
 import android.os.Handler;
 import android.os.Looper;
 
-import java.util.concurrent.TimeUnit;
-
 public abstract class IAbstractCacheTask<T>
         implements
         ITask<T>,
@@ -13,15 +11,10 @@ public abstract class IAbstractCacheTask<T>
         ISaveToCacheTask<T> {
 
     private final IDataExecutorService mIDataExecutorService;
-    private final int mPeriod;
-    private final TimeUnit mTimeUnit;
 
-    public IAbstractCacheTask(final IDataExecutorService pIDataExecutorService,
-                              final int pPeriod,
-                              final TimeUnit pTimeUnit) {
+    public IAbstractCacheTask(final IDataExecutorService pIDataExecutorService) {
         mIDataExecutorService = pIDataExecutorService;
-        mPeriod = pPeriod;
-        mTimeUnit = pTimeUnit;
+
     }
 
     @Override
@@ -31,8 +24,8 @@ public abstract class IAbstractCacheTask<T>
             if (result != null) {
                 updateCache(result);
                 runOnUIThread(result);
-            } else {
-
+            }else {
+                runLocal();
             }
         } catch (final Exception e) {
             mIDataExecutorService.doDatabaseTask(this);
@@ -62,23 +55,13 @@ public abstract class IAbstractCacheTask<T>
         mIDataExecutorService.doNetworkTask(this);
     }
 
-    @Override
-    public int getPeriod() {
-        return mPeriod;
-    }
-
-    @Override
-    public TimeUnit getTimeUnit() {
-        return mTimeUnit;
-    }
-
     private void updateCache(final T result) {
         mIDataExecutorService.saveToCache(this, result);
     }
 
     @Override
     public void cancelTask() {
-        mIDataExecutorService.cancelNetworkTask();
+        //stub
     }
 
     private void runOnUIThread(final T result) {

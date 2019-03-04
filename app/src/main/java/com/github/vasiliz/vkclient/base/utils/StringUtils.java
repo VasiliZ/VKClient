@@ -22,4 +22,8 @@ public final class StringUtils {
         Log.d(TAG, "getAccessToken: "+someToken);
         return someToken;
     }
+
+    public static String replace(String pS){
+        return pS.replace("\"", "");
+    }
 }

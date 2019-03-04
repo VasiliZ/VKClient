@@ -8,5 +8,4 @@ public interface IDataExecutorService {
 
     <T> void saveToCache(final ISaveToCacheTask<T> pSaveToCacheTask, T data);
 
-    void cancelNetworkTask();
 }

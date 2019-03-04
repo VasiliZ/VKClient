@@ -1,8 +1,8 @@
-package com.github.vasiliz.vkclient.vkNews.entity;
+package com.github.vasiliz.vkclient.main.entity;
 
-import com.github.vasiliz.vkclient.base.db.Field;
-import com.github.vasiliz.vkclient.base.db.Id;
-import com.github.vasiliz.vkclient.base.db.Table;
+import com.github.vasiliz.vkclient.base.db.config.Field;
+import com.github.vasiliz.vkclient.base.db.config.Id;
+import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
 public class Item {
 
     @Id
-    private long id;
+    private long idItem;
 
     @Field
     @SerializedName("type")
@@ -136,5 +136,10 @@ public class Item {
 
     public void setViews(final Views pViews) {
         mViews = pViews;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

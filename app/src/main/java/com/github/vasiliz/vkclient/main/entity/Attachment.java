@@ -1,28 +1,25 @@
-package com.github.vasiliz.vkclient.vkNews.entity;
+package com.github.vasiliz.vkclient.main.entity;
 
-import com.github.vasiliz.vkclient.base.db.Field;
-import com.github.vasiliz.vkclient.base.db.Id;
-import com.github.vasiliz.vkclient.base.db.Table;
+import com.github.vasiliz.vkclient.base.db.config.Field;
+import com.github.vasiliz.vkclient.base.db.config.Id;
+import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;
 
 @Table
 public class Attachment {
 
     @Id
-    private long id;
+    private long idAttachment;
 
     @SerializedName("type")
     private String mTypeAttachments;
 
-    @Field
     @SerializedName("photo")
     private Photo mPhoto;
 
-    @Field
     @SerializedName("audio")
     private Audio mAudio;
 
-    @Field
     @SerializedName("video")
     private Video mVideo;
 
