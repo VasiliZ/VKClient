@@ -1,4 +1,4 @@
-package com.github.vasiliz.vkclient.main;
+package com.github.vasiliz.vkclient.news;
 
 public interface INewsModel<T> {
 

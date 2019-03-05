@@ -3,7 +3,7 @@ package com.github.vasiliz.vkclient.base.services;
 import android.os.Handler;
 import android.os.Looper;
 
-public abstract class IAbstractCacheTask<T>
+public abstract class IAbstractTask<T>
         implements
         ITask<T>,
         INetworkTask<T>,
@@ -12,7 +12,7 @@ public abstract class IAbstractCacheTask<T>
 
     private final IDataExecutorService mIDataExecutorService;
 
-    public IAbstractCacheTask(final IDataExecutorService pIDataExecutorService) {
+    public IAbstractTask(final IDataExecutorService pIDataExecutorService) {
         mIDataExecutorService = pIDataExecutorService;
 
     }
@@ -38,7 +38,7 @@ public abstract class IAbstractCacheTask<T>
         try {
             final T result = executeLocal();
             if (result != null) {
-                updateCache(result);
+                runOnUIThread(result);
             }
         } catch (final Exception e) {
             onError();

@@ -1,6 +1,5 @@
-package com.github.vasiliz.vkclient.main.entity;
+package com.github.vasiliz.vkclient.news.entity;
 
-import com.github.vasiliz.vkclient.base.db.config.Field;
 import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;

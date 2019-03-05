@@ -11,7 +11,7 @@ import android.webkit.WebView;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.github.vasiliz.vkclient.R;
 import com.github.vasiliz.vkclient.base.utils.StringUtils;
-import com.github.vasiliz.vkclient.main.ui.VkMainActivity;
+import com.github.vasiliz.vkclient.news.ui.VkMainActivity;
 
 public class LoginActivity extends AppCompatActivity {
 

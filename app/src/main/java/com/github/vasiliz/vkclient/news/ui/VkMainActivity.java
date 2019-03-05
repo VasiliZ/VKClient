@@ -1,4 +1,4 @@
-package com.github.vasiliz.vkclient.main.ui;
+package com.github.vasiliz.vkclient.news.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.github.vasiliz.vkclient.R;
-import com.github.vasiliz.vkclient.main.MainPresenterImpl;
+import com.github.vasiliz.vkclient.news.MainPresenterImpl;
 import com.github.vasiliz.vkclient.mymvp.VkActivity;
 import com.github.vasiliz.vkclient.mymvp.VkPresenter;
 

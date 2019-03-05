@@ -1,12 +1,11 @@
-package com.github.vasiliz.vkclient.main;
-
-import android.util.Log;
+package com.github.vasiliz.vkclient.news;
 
 import com.github.vasiliz.vkclient.VkApplication;
-import com.github.vasiliz.vkclient.base.services.IAbstractCacheTask;
+import com.github.vasiliz.vkclient.base.services.IAbstractTask;
 import com.github.vasiliz.vkclient.base.services.IDataExecutorService;
 import com.github.vasiliz.vkclient.base.streams.HttpInputStreamProvider;
-import com.github.vasiliz.vkclient.main.entity.Response;
+import com.github.vasiliz.vkclient.base.utils.IOUtils;
+import com.github.vasiliz.vkclient.news.entity.Response;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -14,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class NewsModel extends IAbstractCacheTask<Response> {
+public class NewsModel extends IAbstractTask<Response> {
 
     private static final String TAG = NewsModel.class.getSimpleName();
     private IMainPresenter mIMainPresenter;
@@ -28,9 +27,7 @@ public class NewsModel extends IAbstractCacheTask<Response> {
 
     @Override
     public Response executeLocal() {
-        final String s = "lol";
-        Log.d(TAG, "executeLocal: " + s);
-        return null;
+        return VkApplication.getAppDB().getSaveData();
     }
 
     @Override
@@ -47,33 +44,21 @@ public class NewsModel extends IAbstractCacheTask<Response> {
                 res = inputStream.read();
             }
         } catch (final IOException pE) {
-            pE.printStackTrace();
+            pE.fillInStackTrace();
         } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-            } catch (final IOException pE) {
-                pE.printStackTrace();
-            }
+            IOUtils.closeStream(inputStream);
         }
         return jsonToObject(byteArrayOutputStream != null ? byteArrayOutputStream.toString() : null);
-
-
     }
 
     @Override
     public void saveToCache(final Response data) {
-
         VkApplication.getAppDB().writeData(data);
-
-        Log.d(TAG, "saveToCache: " + data);
     }
 
     @Override
-    public void postExecute(final Response pS) {
-        mIMainPresenter.getData(pS);
-        Log.d(TAG, "postExecute: " + pS);
+    public void postExecute(final Response pResponse) {
+        mIMainPresenter.getData(pResponse);
     }
 
 

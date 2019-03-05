@@ -1,4 +1,4 @@
-package com.github.vasiliz.vkclient.main.ui;
+package com.github.vasiliz.vkclient.news.ui;
 
 import com.github.vasiliz.vkclient.mymvp.VkBaseView;
 
