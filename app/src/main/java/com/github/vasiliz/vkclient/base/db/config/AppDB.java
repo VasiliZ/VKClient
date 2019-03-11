@@ -21,6 +21,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Database(databaseName = "mydbVk",
@@ -45,6 +46,8 @@ public final class AppDB {
     private static final String INSERT = "Insert into ";
     private static final String VALUES = " VALUES ";
     private static final String SELECT_FROM = "Select * from ";
+    private static final String LIMIT = " LIMIT ";
+
 
     private AppDB() {
         mDBHelper = new DBHelper(mVkDBConfig, mQueryes);
@@ -186,18 +189,27 @@ public final class AppDB {
         responseNews.setGroupsList(getAllGroups());
         responseNews.setProfileList(getAllProfiles());
         responseNews.setItemList(getAllItems());
+        Log.d(TAG, "getSaveData: " + responseNews.getItemList().size());
+        response.setResponseNews(responseNews);
         return response;
     }
 
-    private Cursor getCursorForSelectAllData(final Class pClass) {
-        final String selectGroups = SELECT_FROM + pClass.getSimpleName();
+    private Cursor getCursorForSelectAllData(final Class pClass, final int pLimit) {
+        final StringBuilder selectBuilder = new StringBuilder();
+        selectBuilder
+                .append(SELECT_FROM)
+                .append(pClass.getSimpleName());
         final SQLiteDatabase database = mDBHelper.getReadableDatabase();
-        return database.rawQuery(selectGroups, null);
+        if (pLimit!=0){
+            selectBuilder.append(LIMIT).append(pLimit);
+        }
+
+        return database.rawQuery(selectBuilder.toString(), null);
     }
 
     private List<Groups> getAllGroups() {
         final List<Groups> groups = new ArrayList<>();
-        final Cursor cursor = getCursorForSelectAllData(Groups.class);
+        final Cursor cursor = getCursorForSelectAllData(Groups.class, 0);
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
                 final Groups group = new Groups();
@@ -216,7 +228,7 @@ public final class AppDB {
     }
 
     private List<Profile> getAllProfiles() {
-        final Cursor cursor = getCursorForSelectAllData(Profile.class);
+        final Cursor cursor = getCursorForSelectAllData(Profile.class, 0);
         final List<Profile> profiles = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
@@ -236,7 +248,7 @@ public final class AppDB {
     }
 
     private List<Item> getAllItems() {
-        Cursor cursor = getCursorForSelectAllData(Item.class);
+        final Cursor cursor = getCursorForSelectAllData(Item.class, 50);
         final List<Item> items = new ArrayList<>();
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
@@ -257,6 +269,7 @@ public final class AppDB {
                 items.add(item);
             }
         }
+        Collections.reverse(items);
         return items;
     }
 

@@ -6,14 +6,19 @@ import com.github.vasiliz.vkclient.base.services.IDataExecutorService;
 import com.github.vasiliz.vkclient.base.streams.HttpInputStreamProvider;
 import com.github.vasiliz.vkclient.base.utils.IOUtils;
 import com.github.vasiliz.vkclient.news.entity.Response;
+import com.github.vasiliz.vkclient.news.observer.Observable;
+import com.github.vasiliz.vkclient.news.observer.Observer;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-public class NewsModel extends IAbstractTask<Response> {
+public class NewsModel extends IAbstractTask<Response> implements Observable<Response> {
+    private List<Observer> mObservers = new ArrayList<>();
 
     private static final String TAG = NewsModel.class.getSimpleName();
     private IMainPresenter mIMainPresenter;
@@ -27,6 +32,7 @@ public class NewsModel extends IAbstractTask<Response> {
 
     @Override
     public Response executeLocal() {
+
         return VkApplication.getAppDB().getSaveData();
     }
 
@@ -58,9 +64,23 @@ public class NewsModel extends IAbstractTask<Response> {
 
     @Override
     public void postExecute(final Response pResponse) {
-        mIMainPresenter.getData(pResponse);
+        if (pResponse!=null) {
+            mIMainPresenter.getData(pResponse);
+            notifyObservers(pResponse);
+        }
     }
 
+    @Override
+    public void registerObserver(Observer pObserver) {
+        mObservers.add(pObserver);
+    }
+
+    @Override
+    public void notifyObservers(Response message) {
+        for (Observer observer:mObservers){
+            observer.notification(message);
+        }
+    }
 
     private Response jsonToObject(final String pResponseNews) {
         final Gson gson = new GsonBuilder().create();
