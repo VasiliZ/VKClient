@@ -25,16 +25,9 @@ public class MainPresenterImpl extends VkPresenter<IMainView> implements IMainPr
         mNewsModel.doTask();
     }
 
-    public void getData(final Response pResponse) {
-        if (pResponse != null) {
-            mINewsView.hideProgress();
-            mResponse = pResponse;
-        }
-    }
-
-
     @Override
-    public void notification(final Response message) {
-        mINewsView.initRecyclerWithData(message);
+    public void notification(final Response pMessage) {
+        mINewsView.hideProgress();
+        mINewsView.setDataToAdapter(pMessage);
     }
 }

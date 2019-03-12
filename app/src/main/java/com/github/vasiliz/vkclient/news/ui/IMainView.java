@@ -8,6 +8,6 @@ public interface IMainView extends VkBaseView {
     void showProgress();
 
     void hideProgress();
-    void initRecyclerWithData(Response pResponse);
+    void setDataToAdapter(Response pResponse);
 
 }

@@ -18,6 +18,7 @@ public class VkMainActivity extends VkActivity implements IMainView{
     private MainPresenterImpl mIMainPresenter;
     private ProgressBar mProgressBar;
     private RecyclerView mRecyclerView;
+    private NewsAdapter mNewsAdapter;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -26,6 +27,7 @@ public class VkMainActivity extends VkActivity implements IMainView{
         mProgressBar = findViewById(R.id.main_progress);
         mRecyclerView = findViewById(R.id.news_recycler_view);
         mIMainPresenter.loadNews();
+        initRecyclerView();
     }
 
 
@@ -50,9 +52,13 @@ public class VkMainActivity extends VkActivity implements IMainView{
         }
     }
 
-    public void initRecyclerWithData(final Response pResponse){
-        final NewsAdapter newsAdapter = new NewsAdapter(this, pResponse);
+    public void initRecyclerView(){
+        mNewsAdapter = new NewsAdapter(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(newsAdapter);
+        mRecyclerView.setAdapter(mNewsAdapter);
+    }
+
+    public void setDataToAdapter(final Response pData){
+        mNewsAdapter.setItems(pData);
     }
 }

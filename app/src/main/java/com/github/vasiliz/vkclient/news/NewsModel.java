@@ -15,16 +15,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class NewsModel extends IAbstractTask<Response> implements Observable<Response> {
-    private List<Observer> mObservers = new ArrayList<>();
+    private final Collection<Observer> mObservers = new ArrayList<>();
 
     private static final String TAG = NewsModel.class.getSimpleName();
-    private IMainPresenter mIMainPresenter;
+    private final IMainPresenter mIMainPresenter;
 
 
-    public NewsModel(final IDataExecutorService pIDataExecutorService, final IMainPresenter pIMainPresenter) {
+    NewsModel(final IDataExecutorService pIDataExecutorService, final IMainPresenter pIMainPresenter) {
         super(pIDataExecutorService);
         mIMainPresenter = pIMainPresenter;
 
@@ -65,19 +65,18 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
     @Override
     public void postExecute(final Response pResponse) {
         if (pResponse!=null) {
-            mIMainPresenter.getData(pResponse);
             notifyObservers(pResponse);
         }
     }
 
     @Override
-    public void registerObserver(Observer pObserver) {
+    public void registerObserver(final Observer pObserver) {
         mObservers.add(pObserver);
     }
 
     @Override
-    public void notifyObservers(Response message) {
-        for (Observer observer:mObservers){
+    public void notifyObservers(final Response message) {
+        for (final Observer observer:mObservers){
             observer.notification(message);
         }
     }
