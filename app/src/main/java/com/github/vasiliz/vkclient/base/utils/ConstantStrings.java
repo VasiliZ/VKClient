@@ -19,7 +19,7 @@ public interface ConstantStrings {
 
         String CREATE_TABLE = "Create table if not exists ";
         String CREATE_ID_COLUMN = " INTEGER PRIMARY KEY AUTOINCREMENT";
-        String COMMA = " , ";
+        String COMMA = " ,";
         String END_OF_QUERY = ");";
         String OPEN_BRACKET = " (";
 

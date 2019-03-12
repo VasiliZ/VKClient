@@ -3,6 +3,9 @@ package com.github.vasiliz.vkclient.base.utils;
 import android.net.Uri;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public final class StringUtils {
 
     private static final String TAG = StringUtils.class.getSimpleName();
@@ -25,5 +28,11 @@ public final class StringUtils {
 
     public static String replace(String pS){
         return pS.replace("\"", "");
+    }
+
+    public static String getDateFromLong(long pDate){
+        Date date = new Date(pDate*1000);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        return dateFormat.format(date);
     }
 }

@@ -1,6 +1,9 @@
 package com.github.vasiliz.vkclient.news;
 
+import android.util.Log;
+
 import com.github.vasiliz.vkclient.VkApplication;
+import com.github.vasiliz.vkclient.base.db.config.AppDB;
 import com.github.vasiliz.vkclient.base.services.IAbstractTask;
 import com.github.vasiliz.vkclient.base.services.IDataExecutorService;
 import com.github.vasiliz.vkclient.base.streams.HttpInputStreamProvider;
@@ -22,6 +25,7 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
 
     private static final String TAG = NewsModel.class.getSimpleName();
     private final IMainPresenter mIMainPresenter;
+    private AppDB mAppDB = VkApplication.getAppDB();
 
 
     NewsModel(final IDataExecutorService pIDataExecutorService, final IMainPresenter pIMainPresenter) {
@@ -32,8 +36,7 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
 
     @Override
     public Response executeLocal() {
-
-        return VkApplication.getAppDB().getSaveData();
+        return mAppDB.getSaveData();
     }
 
     @Override
@@ -59,7 +62,8 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
 
     @Override
     public void saveToCache(final Response data) {
-        VkApplication.getAppDB().writeData(data);
+
+        mAppDB.writeData(data);
     }
 
     @Override

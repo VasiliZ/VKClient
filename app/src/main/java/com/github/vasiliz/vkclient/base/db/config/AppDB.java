@@ -27,8 +27,7 @@ import java.util.List;
 @Database(databaseName = "mydbVk",
         entity = {Profile.class,
                 Item.class,
-                Groups.class,
-                Attachment.class})
+                Groups.class})
 public final class AppDB {
 
     private final DBHelper mDBHelper;
@@ -48,7 +47,6 @@ public final class AppDB {
     private static final String SELECT_FROM = "Select * from ";
     private static final String LIMIT = " LIMIT ";
 
-
     private AppDB() {
         mDBHelper = new DBHelper(mVkDBConfig, mQueryes);
         mDBHelper.getWritableDatabase();
@@ -64,7 +62,7 @@ public final class AppDB {
     }
 
     public void writeData(final Response pResponse) {
-
+        Log.d(TAG, "writeData: " + pResponse.getResponseNews().getItemList().size() + " rly?");
         database = mAppDB.mDBHelper.getWritableDatabase();
         try {
             database.beginTransaction();
@@ -74,12 +72,14 @@ public final class AppDB {
             final String groupTable = headOfQuery(Groups.class) + dataOfQueryGroups(groups);
             final String fillProfileTable = headOfQuery(Profile.class) + dataOfQueryProfiles(profiles);
             final String fillItems = headOfQuery(Item.class) + dataOfQueryItems(items);
+            Log.d(TAG, "writeData: " + groupTable);
             database.execSQL(groupTable);
             database.execSQL(fillProfileTable);
             database.execSQL(fillItems);
             database.setTransactionSuccessful();
         } catch (final Exception e) {
-            Log.d(TAG, "Error while trying read data to db");
+            e.fillInStackTrace();
+            //   Log.d(TAG, "Error while trying read data to db");
         } finally {
             database.endTransaction();
         }
@@ -90,14 +90,20 @@ public final class AppDB {
 
         final StringBuilder stringBuilder = new StringBuilder();
         final Field[] fields = pAnyClass.getDeclaredFields();
+        final List<String> nameFields = new ArrayList<>();
         stringBuilder.append(INSERT)
                 .append(pAnyClass.getSimpleName())
                 .append(OPEN_BRACKET);
         for (final Field field : fields) {
             if (field.isAnnotationPresent(com.github.vasiliz.vkclient.base.db.config.Field.class)) {
-                stringBuilder.append(field.getName())
-                        .append(COMMA);
+                nameFields.add(field.getName());
             }
+        }
+        Collections.sort(nameFields);
+
+        for (final String name : nameFields) {
+            stringBuilder.append(name)
+                    .append(COMMA);
         }
 
         stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
@@ -200,7 +206,7 @@ public final class AppDB {
                 .append(SELECT_FROM)
                 .append(pClass.getSimpleName());
         final SQLiteDatabase database = mDBHelper.getReadableDatabase();
-        if (pLimit!=0){
+        if (pLimit != 0) {
             selectBuilder.append(LIMIT).append(pLimit);
         }
 
@@ -213,14 +219,14 @@ public final class AppDB {
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
                 final Groups group = new Groups();
-                group.setId(cursor.getInt(1));
-                group.setIsClosed(cursor.getInt(2));
-                group.setNameGroup(cursor.getString(3));
-                group.setScreenName(cursor.getString(4));
-                group.setType(cursor.getString(5));
-                group.setUrlGroupPhoto100(cursor.getString(6));
-                group.setUrlGroupPhoto200(cursor.getString(7));
-                group.setUrlGroupPhoto50(cursor.getString(8));
+                group.setId(cursor.getInt(0));
+                group.setIsClosed(cursor.getInt(1));
+                group.setNameGroup(cursor.getString(2));
+                group.setScreenName(cursor.getString(3));
+                group.setType(cursor.getString(4));
+                group.setUrlGroupPhoto100(cursor.getString(5));
+                group.setUrlGroupPhoto200(cursor.getString(6));
+                group.setUrlGroupPhoto50(cursor.getString(7));
                 groups.add(group);
             }
         }
@@ -233,14 +239,14 @@ public final class AppDB {
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
                 final Profile profile = new Profile();
-                profile.setFirstName(cursor.getString(1));
-                profile.setId(cursor.getInt(2));
-                profile.setLastName(cursor.getString(3));
-                profile.setOnline(cursor.getInt(4));
-                profile.setScreenName(cursor.getString(5));
-                profile.setSex(cursor.getString(6));
-                profile.setUrlPhoto100(cursor.getString(7));
-                profile.setUrlPhoto50(cursor.getString(8));
+                profile.setFirstName(cursor.getString(0));
+                profile.setId(cursor.getInt(1));
+                profile.setLastName(cursor.getString(2));
+                profile.setOnline(cursor.getInt(3));
+                profile.setScreenName(cursor.getString(4));
+                profile.setSex(cursor.getString(5));
+                profile.setUrlPhoto100(cursor.getString(6));
+                profile.setUrlPhoto50(cursor.getString(7));
                 profiles.add(profile);
             }
         }
@@ -253,19 +259,22 @@ public final class AppDB {
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
                 final Item item = new Item();
-                item.setAttachments(getGson().fromJson(cursor.getString(1), new TypeToken<ArrayList<Attachment>>() {
+                item.setAttachments(getGson()
+                        .fromJson(cursor.getString(0),
+                                new TypeToken<ArrayList<Attachment>>() {
 
-                }.getType()));
-                item.setComments(getGson().fromJson(cursor.getString(2), Comments.class));
-                item.setDate(cursor.getInt(3));
-                item.setLikes(getGson().fromJson(cursor.getString(4), Likes.class));
-                item.setPostId(cursor.getInt(5));
-                item.setPostType(cursor.getString(6));
-                item.setReposts(getGson().fromJson(cursor.getString(7), Reposts.class));
-                item.setSourseId(cursor.getInt(8));
-                item.setText(cursor.getString(9));
-                item.setType(cursor.getString(10));
-                item.setViews(getGson().fromJson(cursor.getString(11), Views.class));
+                                }.getType()));
+                item.setComments(getGson().fromJson(cursor.getString(1), Comments.class));
+                item.setDate(cursor.getInt(2));
+                item.setLikes(getGson().fromJson(cursor.getString(3), Likes.class));
+                item.setPostId(cursor.getInt(4));
+                item.setPostType(cursor.getString(5));
+                item.setReposts(getGson().fromJson(cursor.getString(6), Reposts.class));
+                item.setSourseId(cursor.getInt(7));
+                item.setText(cursor.getString(8));
+                item.setType(cursor.getString(9));
+                item.setViews(getGson().fromJson(cursor.getString(10), Views.class));
+                Log.d(TAG, "getAllItems: " + getGson().fromJson(cursor.getString(10), Views.class));
                 items.add(item);
             }
         }

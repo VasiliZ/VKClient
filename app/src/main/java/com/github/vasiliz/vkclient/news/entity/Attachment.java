@@ -1,14 +1,9 @@
 package com.github.vasiliz.vkclient.news.entity;
 
-import com.github.vasiliz.vkclient.base.db.config.Id;
-import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;
 
-@Table
-public class Attachment {
 
-    @Id
-    private long idAttachment;
+public class Attachment {
 
     @SerializedName("type")
     private String mTypeAttachments;

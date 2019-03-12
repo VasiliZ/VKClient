@@ -10,4 +10,6 @@ public interface IDataBaseTask<T> {
     @WorkerThread
     void runLocal();
 
+    void saveToCache(T pData);
+
 }

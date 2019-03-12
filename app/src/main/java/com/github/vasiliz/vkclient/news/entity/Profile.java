@@ -8,8 +8,6 @@ import com.google.gson.annotations.SerializedName;
 @Table
 public class Profile {
 
-    @Id
-    private long idProfile;
     @Field
     @SerializedName("id")
     private long mId;

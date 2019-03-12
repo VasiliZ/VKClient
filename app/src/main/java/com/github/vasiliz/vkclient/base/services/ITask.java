@@ -5,7 +5,7 @@ import android.support.annotation.WorkerThread;
 public interface ITask<T> {
 
     @WorkerThread
-    void onError();
+    void onError(Throwable pThrowable);
 
     @WorkerThread
     void doTask();

@@ -6,10 +6,6 @@ import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;
 @Table
 public class Groups {
-
-    @Id
-    private long idGroups;
-
     @Field
     @SerializedName("id")
     private long mId;

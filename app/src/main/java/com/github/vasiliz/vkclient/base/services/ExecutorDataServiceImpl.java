@@ -48,14 +48,15 @@ public final class ExecutorDataServiceImpl implements IDataExecutorService {
     }
 
     @Override
-    public <T> void saveToCache(final ISaveToCacheTask<T> pSaveToCacheTask, final T data) {
-        mDataBaseTask.execute(new Runnable() {
+    public <T> void doSaveToCacheTask(final ISaveToCacheTask<T> pSaveToCacheTask, final T data) {
+        Runnable runnable = new Runnable() {
 
             @Override
             public void run() {
                 pSaveToCacheTask.saveToCache(data);
             }
-        });
+        };
+        mDataBaseTask.execute(runnable);
 
     }
 

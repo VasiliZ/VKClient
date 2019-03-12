@@ -11,6 +11,7 @@ public abstract class IAbstractTask<T>
         ISaveToCacheTask<T> {
 
     private final IDataExecutorService mIDataExecutorService;
+    private T mResult;
 
     public IAbstractTask(final IDataExecutorService pIDataExecutorService) {
         mIDataExecutorService = pIDataExecutorService;
@@ -19,17 +20,18 @@ public abstract class IAbstractTask<T>
 
     @Override
     public void runNetwork() {
+
         try {
-            final T result = executeNetwork();
-            if (result != null) {
-                updateCache(result);
-                runOnUIThread(result);
-            }else {
+            mResult = executeNetwork();
+            if (mResult != null) {
+                saveToCache(mResult);
+                runOnUIThread(mResult);
+            } else {
                 runLocal();
             }
         } catch (final Exception e) {
-            mIDataExecutorService.doDatabaseTask(this);
-            onError();
+            e.fillInStackTrace();
+            onError(e);
         }
     }
 
@@ -41,13 +43,13 @@ public abstract class IAbstractTask<T>
                 runOnUIThread(result);
             }
         } catch (final Exception e) {
-            onError();
+            onError(e);
         }
     }
 
     @Override
-    public void onError() {
-
+    public void onError(final Throwable pThrowable) {
+        pThrowable.getLocalizedMessage();
     }
 
     @Override
@@ -55,8 +57,9 @@ public abstract class IAbstractTask<T>
         mIDataExecutorService.doNetworkTask(this);
     }
 
-    private void updateCache(final T result) {
-        mIDataExecutorService.saveToCache(this, result);
+    @Override
+    public void saveToCache(T pData) {
+        mIDataExecutorService.doSaveToCacheTask(this, pData);
     }
 
     @Override
