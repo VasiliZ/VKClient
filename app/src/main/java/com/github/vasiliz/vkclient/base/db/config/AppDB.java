@@ -2,7 +2,6 @@ package com.github.vasiliz.vkclient.base.db.config;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.github.vasiliz.vkclient.base.utils.StringUtils;
 import com.github.vasiliz.vkclient.news.entity.Attachment;
@@ -62,7 +61,6 @@ public final class AppDB {
     }
 
     public void writeData(final Response pResponse) {
-        Log.d(TAG, "writeData: " + pResponse.getResponseNews().getItemList().size() + " rly?");
         database = mAppDB.mDBHelper.getWritableDatabase();
         try {
             database.beginTransaction();
@@ -72,7 +70,6 @@ public final class AppDB {
             final String groupTable = headOfQuery(Groups.class) + dataOfQueryGroups(groups);
             final String fillProfileTable = headOfQuery(Profile.class) + dataOfQueryProfiles(profiles);
             final String fillItems = headOfQuery(Item.class) + dataOfQueryItems(items);
-            Log.d(TAG, "writeData: " + groupTable);
             database.execSQL(groupTable);
             database.execSQL(fillProfileTable);
             database.execSQL(fillItems);
@@ -195,7 +192,6 @@ public final class AppDB {
         responseNews.setGroupsList(getAllGroups());
         responseNews.setProfileList(getAllProfiles());
         responseNews.setItemList(getAllItems());
-        Log.d(TAG, "getSaveData: " + responseNews.getItemList().size());
         response.setResponseNews(responseNews);
         return response;
     }
@@ -274,7 +270,6 @@ public final class AppDB {
                 item.setText(cursor.getString(8));
                 item.setType(cursor.getString(9));
                 item.setViews(getGson().fromJson(cursor.getString(10), Views.class));
-                Log.d(TAG, "getAllItems: " + getGson().fromJson(cursor.getString(10), Views.class));
                 items.add(item);
             }
         }

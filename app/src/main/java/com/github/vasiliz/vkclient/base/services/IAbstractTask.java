@@ -20,7 +20,6 @@ public abstract class IAbstractTask<T>
 
     @Override
     public void runNetwork() {
-
         try {
             mResult = executeNetwork();
             if (mResult != null) {
@@ -58,7 +57,7 @@ public abstract class IAbstractTask<T>
     }
 
     @Override
-    public void saveToCache(T pData) {
+    public void saveToCache(final T pData) {
         mIDataExecutorService.doSaveToCacheTask(this, pData);
     }
 

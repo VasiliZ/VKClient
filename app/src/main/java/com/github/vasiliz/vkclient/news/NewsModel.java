@@ -1,7 +1,5 @@
 package com.github.vasiliz.vkclient.news;
 
-import android.util.Log;
-
 import com.github.vasiliz.vkclient.VkApplication;
 import com.github.vasiliz.vkclient.base.db.config.AppDB;
 import com.github.vasiliz.vkclient.base.services.IAbstractTask;

@@ -5,6 +5,10 @@ import com.google.gson.annotations.SerializedName;
 public class Photo {
     @SerializedName("photo_604")
     private String mPhoto604;
+    @SerializedName("photo_807")
+    private String mPhoto807;
+    @SerializedName("photo_1280")
+    private String mPhoto1280;
     @SerializedName("id")
     private long mId;
     @SerializedName("user_id")
@@ -23,8 +27,26 @@ public class Photo {
     public Photo() {
     }
 
+    public String getPhoto807() {
+        return mPhoto807;
+    }
+
+    public Photo setPhoto807(String pPhoto807) {
+        mPhoto807 = pPhoto807;
+        return this;
+    }
+
     public String getPhoto604() {
         return mPhoto604;
+    }
+
+    public String getPhoto1280() {
+        return mPhoto1280;
+    }
+
+    public Photo setPhoto1280(String pPhoto1280) {
+        mPhoto1280 = pPhoto1280;
+        return this;
     }
 
     public void setPhoto604(final String pPhoto604) {

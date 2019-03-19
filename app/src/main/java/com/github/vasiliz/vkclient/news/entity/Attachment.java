@@ -17,8 +17,20 @@ public class Attachment {
     @SerializedName("video")
     private Video mVideo;
 
+    @SerializedName("doc")
+    private Doc mDoc;
+
     public Attachment() {
 
+    }
+
+    public Doc getDoc() {
+        return mDoc;
+    }
+
+    public Attachment setDoc(Doc pDoc) {
+        mDoc = pDoc;
+        return this;
     }
 
     public String getTypeAttachments() {
