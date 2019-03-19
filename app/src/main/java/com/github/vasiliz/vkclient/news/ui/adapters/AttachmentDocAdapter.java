@@ -36,10 +36,12 @@ public class AttachmentDocAdapter extends RecyclerView.Adapter<AttachmentDocAdap
     public void onBindViewHolder(@NonNull final DocItemHolder pDocItemHolder, final int pI) {
         final Doc doc = mDocs.get(pI);
         pDocItemHolder.mTextView.setText(doc.getTitle());
-        ImageLoader.getInstance()
-                .with(mLayoutInflater.getContext())
-                .load(doc.getPreview().getPhotoDocPreview().getSizesPhotoPreviews().get(2).getSourse())
-                .into(pDocItemHolder.mImageView);
+        if (doc.getPreview() != null) {
+            ImageLoader.getInstance()
+                    .with(mLayoutInflater.getContext())
+                    .load(doc.getPreview().getPhotoDocPreview().getSizesPhotoPreviews().get(2).getSourse())
+                    .into(pDocItemHolder.mImageView);
+        }
     }
 
     @Override

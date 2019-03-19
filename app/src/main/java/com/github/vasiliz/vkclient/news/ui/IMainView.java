@@ -10,4 +10,7 @@ public interface IMainView extends VkBaseView {
     void hideProgress();
     void setDataToAdapter(Response pResponse);
 
+    void dataLastPage(boolean pIsReady);
+
+    void loadMoreData(boolean pIsLoading);
 }

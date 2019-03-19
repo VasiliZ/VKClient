@@ -13,12 +13,20 @@ import com.github.vasiliz.vkclient.mymvp.VkActivity;
 import com.github.vasiliz.vkclient.mymvp.VkPresenter;
 import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.ui.adapters.NewsAdapter;
+import com.github.vasiliz.vkclient.news.ui.listeners.PaginationScrollListener;
 
 public class VkMainActivity extends VkActivity implements IMainView{
     private MainPresenterImpl mIMainPresenter;
     private ProgressBar mProgressBar;
     private RecyclerView mRecyclerView;
     private NewsAdapter mNewsAdapter;
+    private boolean isLastPage;
+
+
+
+    private boolean isLoading;
+    public static int PAGE_START = 1;
+    private int currentPage = PAGE_START;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -54,11 +62,45 @@ public class VkMainActivity extends VkActivity implements IMainView{
 
     public void initRecyclerView(){
         mNewsAdapter = new NewsAdapter(this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setAdapter(mNewsAdapter);
+
+        mRecyclerView.addOnScrollListener(new PaginationScrollListener(linearLayoutManager) {
+
+            @Override
+            protected void loadMoreItems() {
+                isLoading = true;
+                currentPage++;
+                mIMainPresenter.loadMoreNews();
+            }
+
+            @Override
+            public boolean isLastPage() {
+                return isLastPage;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+        });
     }
+
+
 
     public void setDataToAdapter(final Response pData){
         mNewsAdapter.setItems(pData);
     }
+
+    @Override
+    public void dataLastPage(boolean pIsLoading) {
+        isLastPage = pIsLoading;
+    }
+
+    @Override
+    public void loadMoreData(boolean pIsLoading) {
+        isLoading = pIsLoading;
+    }
+
 }

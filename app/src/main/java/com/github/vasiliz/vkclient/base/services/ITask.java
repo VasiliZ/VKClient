@@ -10,6 +10,9 @@ public interface ITask<T> {
     @WorkerThread
     void doTask();
 
+    @WorkerThread
+    void doTask(boolean pLoadMore);
+
     void postExecute(T pT);
 
     void cancelTask();

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
+public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder> {
 
     private final LayoutInflater mLayoutInflater;
     private final List<Item> mItems;
@@ -47,137 +47,15 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
 
     }
 
-    @NonNull
     @Override
-    public NewsViewHolder onCreateViewHolder(@NonNull final ViewGroup pViewGroup, final int pI) {
+    public BaseViewHolder onCreateViewHolder(@NonNull final ViewGroup pViewGroup, final int pI) {
         final View view = mLayoutInflater.inflate(R.layout.item_news, pViewGroup, false);
         return new NewsViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final NewsViewHolder pViewHolder, final int pPosition) {
-        final Item item = mItems.get(pPosition);
-        final Groups groups = getGroup(item);
-        final Profile profile = getProfile(item);
-
-        pViewHolder.mTextNews.setText(item.getText());
-        if (groups != null) {
-            mImageLoader
-                    .with(mLayoutInflater.getContext())
-                    .load(groups.getUrlGroupPhoto50())
-                    .into(pViewHolder.mCircleView);
-            pViewHolder.mName.setText(groups.getNameGroup());
-        } else {
-            mImageLoader
-                    .with(mLayoutInflater.getContext())
-                    .load(profile.getUrlPhoto50())
-                    .into(pViewHolder.mCircleView);
-            pViewHolder.mName.setText(String
-                    .format(profile.getFirstName() + "%s" + profile.getLastName(), " "));
-        }
-
-        pViewHolder.mCircleView.setImageResource(R.drawable.test_drawable);
-
-        pViewHolder.mDate.setText(StringUtils.getDateFromLong(item.getDate()));
-
-        pViewHolder.mRepostText.setText(String.valueOf(item.getReposts().getCountReposts()));
-        //footer item
-
-        pViewHolder.mLikeText.setText(String.valueOf(item.getLikes().getCountLike()));
-
-        //attachments content
-
-        if (item.getAttachments() == null) {
-            pViewHolder.mImageContainer.setVisibility(View.GONE);
-            pViewHolder.mAudioContainer.setVisibility(View.GONE);
-            pViewHolder.mVideoCOntainer.setVisibility(View.GONE);
-            pViewHolder.mDocContainer.setVisibility(View.GONE);
-        } else {
-            final List<Photo> photos = new ArrayList<>();
-            final List<Audio> audioList = new ArrayList<>();
-            final List<Video> videos = new ArrayList<>();
-            final List<Doc> docs = new ArrayList<>();
-
-            for (final Attachment attachment : item.getAttachments()) {
-                switch (attachment.getTypeAttachments()) {
-                    case "photo":
-                        photos.add(attachment.getPhoto());
-                        break;
-                    case "audio":
-                        audioList.add(attachment.getAudio());
-                        break;
-                    case "video":
-                        videos.add(attachment.getVideo());
-                        break;
-                    case "doc":
-                        docs.add(attachment.getDoc());
-                        break;
-                }
-            }
-            if (!photos.isEmpty()) {
-                pViewHolder.mImageContainer.setVisibility(View.VISIBLE);
-                mAttachmentImageAdapter =
-                        new AttachmentImageAdapter(mLayoutInflater.getContext(), photos);
-                final LinearLayoutManager linearLayoutManager =
-                        new LinearLayoutManager(mLayoutInflater.getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                pViewHolder.mImageContainer
-                        .setLayoutManager(linearLayoutManager);
-                pViewHolder.mImageContainer.getRecycledViewPool().clear();
-                pViewHolder.mImageContainer.setAdapter(mAttachmentImageAdapter);
-            } else {
-                pViewHolder.mImageContainer.setVisibility(View.GONE);
-            }
-
-            if (!audioList.isEmpty()) {
-                pViewHolder.mAudioContainer.setVisibility(View.VISIBLE);
-                final AttachmentAudioAdapter attachmentAudioAdapter =
-                        new AttachmentAudioAdapter(mLayoutInflater.getContext(), audioList);
-                final LinearLayoutManager linearLayoutManager =
-                        new LinearLayoutManager(mLayoutInflater.getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                pViewHolder.mAudioContainer.setLayoutManager(linearLayoutManager);
-                pViewHolder.mAudioContainer.getRecycledViewPool().clear();
-                pViewHolder.mAudioContainer.setAdapter(attachmentAudioAdapter);
-            } else {
-                pViewHolder.mAudioContainer.setVisibility(View.GONE);
-            }
-
-            if (!videos.isEmpty()) {
-                pViewHolder.mVideoCOntainer.setVisibility(View.VISIBLE);
-                final AttachmentVideoAdapter attachmentVideoAdapter =
-                        new AttachmentVideoAdapter(mLayoutInflater.getContext(), videos);
-                final LinearLayoutManager linearLayoutManager =
-                        new LinearLayoutManager(mLayoutInflater.getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-
-                pViewHolder.mVideoCOntainer.setLayoutManager(linearLayoutManager);
-                pViewHolder.mVideoCOntainer.setAdapter(attachmentVideoAdapter);
-            } else {
-                pViewHolder.mVideoCOntainer.setVisibility(View.GONE);
-            }
-
-            if (!docs.isEmpty()) {
-                pViewHolder.mDocContainer.setVisibility(View.VISIBLE);
-                final AttachmentDocAdapter attachmentDocAdapter =
-                        new AttachmentDocAdapter(mLayoutInflater.getContext(), docs);
-                final LinearLayoutManager linearLayoutManager =
-                        new LinearLayoutManager(mLayoutInflater.getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-
-                pViewHolder.mDocContainer.setLayoutManager(linearLayoutManager);
-                pViewHolder.mDocContainer.setAdapter(attachmentDocAdapter);
-            } else {
-                pViewHolder.mDocContainer.setVisibility(View.GONE);
-            }
-        }
-
-        if (item.getComments().getCanPost() == 1) {
-            pViewHolder.mCommentContainer.setVisibility(View.VISIBLE);
-            pViewHolder.mCommentText.setText(String.valueOf(item.getComments().getCountComments()));
-        } else {
-            pViewHolder.mCommentContainer.setVisibility(View.GONE);
-        }
+    public void onBindViewHolder(@NonNull final BaseViewHolder pViewHolder, final int pPosition) {
+        pViewHolder.onBind(pPosition);
 
     }
 
@@ -207,7 +85,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         return 0;
     }
 
-    class NewsViewHolder extends RecyclerView.ViewHolder {
+    class NewsViewHolder extends BaseViewHolder {
 
         private final CircleImage mCircleView;
         private final TextView mTextNews;
@@ -240,6 +118,139 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
             mDocContainer = itemView.findViewById(R.id.doc_container);
 
         }
+
+        @Override
+        protected void clear() {
+
+        }
+
+        @Override
+        public void onBind(final int pPosition) {
+            super.onBind(pPosition);
+
+            final Item item = mItems.get(pPosition);
+            final Groups groups = getGroup(item);
+            final Profile profile = getProfile(item);
+
+            mTextNews.setText(item.getText());
+            if (groups != null) {
+                mImageLoader
+                        .with(mLayoutInflater.getContext())
+                        .load(groups.getUrlGroupPhoto50())
+                        .into(mCircleView);
+                mName.setText(groups.getNameGroup());
+            } else {
+                mImageLoader
+                        .with(mLayoutInflater.getContext())
+                        .load(profile.getUrlPhoto50())
+                        .into(mCircleView);
+                mName.setText(String
+                        .format(profile.getFirstName() + "%s" + profile.getLastName(), " "));
+            }
+
+            mCircleView.setImageResource(R.drawable.test_drawable);
+
+            mDate.setText(StringUtils.getDateFromLong(item.getDate()));
+
+            mRepostText.setText(String.valueOf(item.getReposts().getCountReposts()));
+            //footer item
+
+            mLikeText.setText(String.valueOf(item.getLikes().getCountLike()));
+
+            //attachments content
+
+            if (item.getAttachments() == null) {
+                mImageContainer.setVisibility(View.GONE);
+                mAudioContainer.setVisibility(View.GONE);
+                mVideoCOntainer.setVisibility(View.GONE);
+                mDocContainer.setVisibility(View.GONE);
+            } else {
+                final List<Photo> photos = new ArrayList<>();
+                final List<Audio> audioList = new ArrayList<>();
+                final List<Video> videos = new ArrayList<>();
+                final List<Doc> docs = new ArrayList<>();
+
+                for (final Attachment attachment : item.getAttachments()) {
+                    switch (attachment.getTypeAttachments()) {
+                        case "photo":
+                            photos.add(attachment.getPhoto());
+                            break;
+                        case "audio":
+                            audioList.add(attachment.getAudio());
+                            break;
+                        case "video":
+                            videos.add(attachment.getVideo());
+                            break;
+                        case "doc":
+                            docs.add(attachment.getDoc());
+                            break;
+                    }
+                }
+                if (!photos.isEmpty()) {
+                    mImageContainer.setVisibility(View.VISIBLE);
+                    mAttachmentImageAdapter =
+                            new AttachmentImageAdapter(mLayoutInflater.getContext(), photos);
+                    final LinearLayoutManager linearLayoutManager =
+                            new LinearLayoutManager(mLayoutInflater.getContext());
+                    linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                    mImageContainer
+                            .setLayoutManager(linearLayoutManager);
+                    mImageContainer.getRecycledViewPool().clear();
+                    mImageContainer.setAdapter(mAttachmentImageAdapter);
+                } else {
+                    mImageContainer.setVisibility(View.GONE);
+                }
+
+                if (!audioList.isEmpty()) {
+                    mAudioContainer.setVisibility(View.VISIBLE);
+                    final AttachmentAudioAdapter attachmentAudioAdapter =
+                            new AttachmentAudioAdapter(mLayoutInflater.getContext(), audioList);
+                    final LinearLayoutManager linearLayoutManager =
+                            new LinearLayoutManager(mLayoutInflater.getContext());
+                    linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    mAudioContainer.setLayoutManager(linearLayoutManager);
+                    mAudioContainer.getRecycledViewPool().clear();
+                    mAudioContainer.setAdapter(attachmentAudioAdapter);
+                } else {
+                    mAudioContainer.setVisibility(View.GONE);
+                }
+
+                if (!videos.isEmpty()) {
+                    mVideoCOntainer.setVisibility(View.VISIBLE);
+                    final AttachmentVideoAdapter attachmentVideoAdapter =
+                            new AttachmentVideoAdapter(mLayoutInflater.getContext(), videos);
+                    final LinearLayoutManager linearLayoutManager =
+                            new LinearLayoutManager(mLayoutInflater.getContext());
+                    linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+                    mVideoCOntainer.setLayoutManager(linearLayoutManager);
+                    mVideoCOntainer.setAdapter(attachmentVideoAdapter);
+                } else {
+                    mVideoCOntainer.setVisibility(View.GONE);
+                }
+
+                if (!docs.isEmpty()) {
+                    mDocContainer.setVisibility(View.VISIBLE);
+                    final AttachmentDocAdapter attachmentDocAdapter =
+                            new AttachmentDocAdapter(mLayoutInflater.getContext(), docs);
+                    final LinearLayoutManager linearLayoutManager =
+                            new LinearLayoutManager(mLayoutInflater.getContext());
+                    linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+
+                    mDocContainer.setLayoutManager(linearLayoutManager);
+                    mDocContainer.setAdapter(attachmentDocAdapter);
+                } else {
+                    mDocContainer.setVisibility(View.GONE);
+                }
+            }
+
+            if (item.getComments().getCanPost() == 1) {
+                mCommentContainer.setVisibility(View.VISIBLE);
+                mCommentText.setText(String.valueOf(item.getComments().getCountComments()));
+            } else {
+                mCommentContainer.setVisibility(View.GONE);
+            }
+        }
     }
 
     public void setItems(final Response pResponseNews) {
@@ -247,7 +258,10 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         final List<Groups> groups = pResponseNews.getResponseNews().getGroupsList();
         final List<Profile> profiles = pResponseNews.getResponseNews().getProfileList();
 
-        mItems.addAll(items);
+        for (Item item : items) {
+            add(item);
+        }
+
         mGroups.addAll(groups);
         mProfiles.addAll(profiles);
 
@@ -258,4 +272,23 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         notifyDataSetChanged();
     }
 
+    private void add(Item pItem) {
+        mItems.add(pItem);
+        notifyItemInserted(mItems.size() - 1);
+    }
+
+    abstract class BaseViewHolder extends RecyclerView.ViewHolder {
+
+        private int mCurrentPosition;
+
+        public BaseViewHolder(@NonNull final View itemView) {
+            super(itemView);
+        }
+
+        public void onBind(final int pPosition) {
+            mCurrentPosition = pPosition;
+        }
+
+        protected abstract void clear();
+    }
 }

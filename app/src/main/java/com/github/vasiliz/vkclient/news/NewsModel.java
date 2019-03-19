@@ -19,16 +19,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class NewsModel extends IAbstractTask<Response> implements Observable<Response> {
+
     private final Collection<Observer> mObservers = new ArrayList<>();
 
     private static final String TAG = NewsModel.class.getSimpleName();
-    private final IMainPresenter mIMainPresenter;
     private AppDB mAppDB = VkApplication.getAppDB();
+    private String mNextFromNews;
 
-
-    NewsModel(final IDataExecutorService pIDataExecutorService, final IMainPresenter pIMainPresenter) {
+    NewsModel(final IDataExecutorService pIDataExecutorService) {
         super(pIDataExecutorService);
-        mIMainPresenter = pIMainPresenter;
 
     }
 
@@ -38,12 +37,16 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
     }
 
     @Override
-    public Response executeNetwork() {
-
+    public Response executeNetwork(final boolean pLoadMore) {
         InputStream inputStream = null;
         ByteArrayOutputStream byteArrayOutputStream = null;
+
         try {
-            inputStream = new HttpInputStreamProvider().get("https://api.vk.com/method/newsfeed.get?filters=post&access_token=5401b44b25958826793dc6ca3ea87f17958cf7ba4a316af4c89acdb5c2d24559f090d8a2511f336149de6&v=5.69");
+            if (pLoadMore) {
+                inputStream = new HttpInputStreamProvider().get("https://api.vk.com/method/newsfeed.get?filters=post&end_time&start_from=" + mNextFromNews + "&access_token=5401b44b25958826793dc6ca3ea87f17958cf7ba4a316af4c89acdb5c2d24559f090d8a2511f336149de6&v=5.69");
+            } else {
+                inputStream = new HttpInputStreamProvider().get("https://api.vk.com/method/newsfeed.get?filters=post&access_token=5401b44b25958826793dc6ca3ea87f17958cf7ba4a316af4c89acdb5c2d24559f090d8a2511f336149de6&v=5.69");
+            }
             byteArrayOutputStream = new ByteArrayOutputStream();
             int res = inputStream.read();
             while (res != -1) {
@@ -56,6 +59,11 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
             IOUtils.closeStream(inputStream);
         }
         return jsonToObject(byteArrayOutputStream != null ? byteArrayOutputStream.toString() : null);
+
+    }
+
+    public void getStringForNextScope(final String pForNextNews) {
+        mNextFromNews = pForNextNews;
     }
 
     @Override
@@ -66,7 +74,7 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
 
     @Override
     public void postExecute(final Response pResponse) {
-        if (pResponse!=null) {
+        if (pResponse != null) {
             notifyObservers(pResponse);
         }
     }
@@ -78,7 +86,7 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
 
     @Override
     public void notifyObservers(final Response message) {
-        for (final Observer observer:mObservers){
+        for (final Observer observer : mObservers) {
             observer.notification(message);
         }
     }

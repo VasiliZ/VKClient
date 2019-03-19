@@ -11,8 +11,14 @@ public class ResponseNews {
     private List<Profile> mProfileList;
     @SerializedName("groups")
     private List<Groups> mGroupsList;
+    @SerializedName("next_from")
+    private String mNewtNews;
 
     public ResponseNews() {
+    }
+
+    public String getNextNews() {
+        return mNewtNews;
     }
 
     public ResponseNews(final List<Item> pItemList) {
