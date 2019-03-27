@@ -36,7 +36,7 @@ public class VkDatabaseCreator {
                         + aClass.getSimpleName()
                         + ConstantStrings.DB.OPEN_BRACKET;
                 final Field[] fields = aClass.getDeclaredFields();
-                final List<String> tableFields = new ArrayList<>();
+                final List<String> tableFields = new ArrayList();
                 for (final Field field : fields) {
                     final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
                     for (final Annotation annotation1 : declaredAnnotations) {

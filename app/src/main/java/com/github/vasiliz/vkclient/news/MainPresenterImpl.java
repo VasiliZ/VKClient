@@ -1,7 +1,5 @@
 package com.github.vasiliz.vkclient.news;
 
-import android.support.v7.widget.RecyclerView;
-
 import com.github.vasiliz.vkclient.base.services.ExecutorDataServiceImpl;
 import com.github.vasiliz.vkclient.mymvp.VkPresenter;
 import com.github.vasiliz.vkclient.news.entity.Response;
@@ -38,5 +36,8 @@ public class MainPresenterImpl extends VkPresenter<IMainView> implements IMainPr
         mINewsView.setDataToAdapter(pMessage);
         mINewsView.dataLastPage(true);
         mINewsView.loadMoreData(false);
+        if (mINewsView.handleSwipe()!=null) {
+            mINewsView.handleSwipe().setRefreshing(false);
+        }
     }
 }

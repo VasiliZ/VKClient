@@ -1,6 +1,9 @@
 package com.github.vasiliz.vkclient.news;
 
+import android.util.Log;
+
 import com.github.vasiliz.vkclient.VkApplication;
+import com.github.vasiliz.vkclient.base.api.CreateRequest;
 import com.github.vasiliz.vkclient.base.db.config.AppDB;
 import com.github.vasiliz.vkclient.base.services.IAbstractTask;
 import com.github.vasiliz.vkclient.base.services.IDataExecutorService;
@@ -20,13 +23,19 @@ import java.util.Collection;
 
 public class NewsModel extends IAbstractTask<Response> implements Observable<Response> {
 
-    private final Collection<Observer> mObservers = new ArrayList<>();
+    private final Collection<Observer> mObservers = new ArrayList<Observer>();
 
     private static final String TAG = NewsModel.class.getSimpleName();
     private AppDB mAppDB = VkApplication.getAppDB();
-    private String mNextFromNews;
+    private String FILTERS = "post";
+    private String ACCESS_TOKEN = "5401b44b25958826793dc6ca3ea87f17958cf7ba4a316af4c89acdb5c2d24559f090d8a2511f336149de6";
+    private String VERSION = "5.69";
+    String mNextFromNews;
 
-    NewsModel(final IDataExecutorService pIDataExecutorService) {
+    private CreateRequest mCreateRequest = VkApplication.getCreateRequest();
+    private CreateRequest mLoadMoreNews = VkApplication.getmLoadMoreNewsApiTemplate();
+
+    public NewsModel(final IDataExecutorService pIDataExecutorService) {
         super(pIDataExecutorService);
 
     }
@@ -43,9 +52,12 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
 
         try {
             if (pLoadMore) {
-                inputStream = new HttpInputStreamProvider().get("https://api.vk.com/method/newsfeed.get?filters=post&end_time&start_from=" + mNextFromNews + "&access_token=5401b44b25958826793dc6ca3ea87f17958cf7ba4a316af4c89acdb5c2d24559f090d8a2511f336149de6&v=5.69");
+                final String tamplateApi = mLoadMoreNews.getTamplateApiString();
+                Log.d(TAG, "executeNetwork: " + tamplateApi);
+                inputStream = new HttpInputStreamProvider().get(String.format(tamplateApi, FILTERS, ACCESS_TOKEN, mNextFromNews, VERSION));
             } else {
-                inputStream = new HttpInputStreamProvider().get("https://api.vk.com/method/newsfeed.get?filters=post&access_token=5401b44b25958826793dc6ca3ea87f17958cf7ba4a316af4c89acdb5c2d24559f090d8a2511f336149de6&v=5.69");
+                final String tamplateApi = mCreateRequest.getTamplateApiString();
+                inputStream = new HttpInputStreamProvider().get(String.format(tamplateApi, FILTERS, ACCESS_TOKEN, VERSION));
             }
             byteArrayOutputStream = new ByteArrayOutputStream();
             int res = inputStream.read();

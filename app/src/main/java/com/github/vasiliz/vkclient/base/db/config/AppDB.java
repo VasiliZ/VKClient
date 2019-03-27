@@ -87,7 +87,7 @@ public final class AppDB {
 
         final StringBuilder stringBuilder = new StringBuilder();
         final Field[] fields = pAnyClass.getDeclaredFields();
-        final List<String> nameFields = new ArrayList<>();
+        final List<String> nameFields = new ArrayList();
         stringBuilder.append(INSERT)
                 .append(pAnyClass.getSimpleName())
                 .append(OPEN_BRACKET);
@@ -210,7 +210,7 @@ public final class AppDB {
     }
 
     private List<Groups> getAllGroups() {
-        final List<Groups> groups = new ArrayList<>();
+        final List<Groups> groups = new ArrayList<Groups>();
         final Cursor cursor = getCursorForSelectAllData(Groups.class, 0);
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
@@ -231,7 +231,7 @@ public final class AppDB {
 
     private List<Profile> getAllProfiles() {
         final Cursor cursor = getCursorForSelectAllData(Profile.class, 0);
-        final List<Profile> profiles = new ArrayList<>();
+        final List<Profile> profiles = new ArrayList<Profile>();
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
                 final Profile profile = new Profile();
@@ -251,15 +251,13 @@ public final class AppDB {
 
     private List<Item> getAllItems() {
         final Cursor cursor = getCursorForSelectAllData(Item.class, 50);
-        final List<Item> items = new ArrayList<>();
+        final List<Item> items = new ArrayList<Item>();
         if (cursor.moveToFirst()) {
             while (cursor.moveToNext()) {
                 final Item item = new Item();
-                item.setAttachments(getGson()
+                item.setAttachments((List<Attachment>) getGson()
                         .fromJson(cursor.getString(0),
-                                new TypeToken<ArrayList<Attachment>>() {
-
-                                }.getType()));
+                                new TypeToken<ArrayList<Attachment>>() {}.getType()));
                 item.setComments(getGson().fromJson(cursor.getString(1), Comments.class));
                 item.setDate(cursor.getInt(2));
                 item.setLikes(getGson().fromJson(cursor.getString(3), Likes.class));

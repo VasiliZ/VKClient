@@ -3,7 +3,7 @@ package com.github.vasiliz.vkclient.api;
 import com.github.vasiliz.vkclient.base.api.GET;
 import com.github.vasiliz.vkclient.base.api.Query;
 
-public interface RequestService {
+public interface RequestNews {
 
     @GET(method = "method/newsfeed.get")
     void getNews(@Query("filters") String pFilters,

@@ -40,9 +40,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
 
     public NewsAdapter(final Context pContext) {
         mLayoutInflater = LayoutInflater.from(pContext);
-        mItems = new ArrayList<>();
-        mGroups = new ArrayList<>();
-        mProfiles = new ArrayList<>();
+        mItems = new ArrayList<Item>();
+        mGroups = new ArrayList<Groups>();
+        mProfiles = new ArrayList<Profile>();
         mImageLoader = VkApplication.getmImageLoader();
 
     }
@@ -57,6 +57,12 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
     public void onBindViewHolder(@NonNull final BaseViewHolder pViewHolder, final int pPosition) {
         pViewHolder.onBind(pPosition);
 
+    }
+
+    public void clear() {
+        mItems.clear();
+        mGroups.clear();
+        mProfiles.clear();
     }
 
     private Profile getProfile(final Item pItem) {
@@ -165,25 +171,24 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
                 mVideoCOntainer.setVisibility(View.GONE);
                 mDocContainer.setVisibility(View.GONE);
             } else {
-                final List<Photo> photos = new ArrayList<>();
-                final List<Audio> audioList = new ArrayList<>();
-                final List<Video> videos = new ArrayList<>();
-                final List<Doc> docs = new ArrayList<>();
+                final List<Photo> photos = new ArrayList<Photo>();
+                final List<Audio> audioList = new ArrayList<Audio>();
+                final List<Video> videos = new ArrayList<Video>();
+                final List<Doc> docs = new ArrayList<Doc>();
 
                 for (final Attachment attachment : item.getAttachments()) {
-                    switch (attachment.getTypeAttachments()) {
-                        case "photo":
-                            photos.add(attachment.getPhoto());
-                            break;
-                        case "audio":
-                            audioList.add(attachment.getAudio());
-                            break;
-                        case "video":
-                            videos.add(attachment.getVideo());
-                            break;
-                        case "doc":
-                            docs.add(attachment.getDoc());
-                            break;
+                    if ("photo".equals(attachment.getTypeAttachments())) {
+                        photos.add(attachment.getPhoto());
+
+                    } else if ("audio".equals(attachment.getTypeAttachments())) {
+                        audioList.add(attachment.getAudio());
+
+                    } else if ("video".equals(attachment.getTypeAttachments())) {
+                        videos.add(attachment.getVideo());
+
+                    } else if ("doc".equals(attachment.getTypeAttachments())) {
+                        docs.add(attachment.getDoc());
+
                     }
                 }
                 if (!photos.isEmpty()) {

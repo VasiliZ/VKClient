@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/dimen_8dp"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
@@ -22,26 +23,30 @@
                 android:id="@+id/avatar_image_view"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:layout_margin="8dp"/>
+                android:layout_margin="@dimen/dimen_8dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/name_group_or_profile_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
+                    android:layout_marginBottom="@dimen/dimen_4dp"
+                    android:layout_marginLeft="@dimen/dimen_8dp"
+                    android:layout_marginTop="@dimen/dimen_8dp"
                     tools:hint="test text"/>
 
                 <TextView
                     android:id="@+id/time_post_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
+                    android:layout_marginBottom="@dimen/dimen_8dp"
+                    android:layout_marginLeft="@dimen/dimen_8dp"
+                    android:layout_marginTop="@dimen/dimen_4dp"
                     tools:hint="test text"/>
             </LinearLayout>
 
@@ -67,6 +72,7 @@
             android:id="@+id/audio_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/doc_container"
             android:layout_width="match_parent"
@@ -132,8 +138,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>
-
-
         </LinearLayout>
     </LinearLayout>
 

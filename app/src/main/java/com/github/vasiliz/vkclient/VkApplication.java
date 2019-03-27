@@ -1,9 +1,11 @@
 package com.github.vasiliz.vkclient;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.github.vasiliz.myimageloader.ImageLoader;
+import com.github.vasiliz.vkclient.api.LoadMoreNews;
+import com.github.vasiliz.vkclient.api.RequestNews;
+import com.github.vasiliz.vkclient.base.api.CreateRequest;
 import com.github.vasiliz.vkclient.base.db.config.AppDB;
 import com.github.vasiliz.vkclient.base.db.config.VkDBConfig;
 import com.github.vasiliz.vkclient.base.db.config.VkDatabaseCreator;
@@ -14,6 +16,8 @@ public class VkApplication extends Application {
     private String TAG = VkApplication.class.getSimpleName();
     private  static AppDB mAppDB;
     private static ImageLoader mImageLoader;
+    private static CreateRequest mCreateRequest;
+    private static CreateRequest mLoadMoreNews;
 
     @Override
     public void onCreate() {
@@ -37,6 +41,24 @@ public class VkApplication extends Application {
         mAppDB = AppDB.getInstanceDB(vkDBConfig, vkDatabaseCreator.getListQueryForCreateTable());
         //init image loader
         mImageLoader = ImageLoader.getInstance();
+
+        mCreateRequest = new CreateRequest.Builder()
+                .setBaseUrl("https://api.vk.com/")
+                .setServiceClass(RequestNews.class)
+                .build();
+        mLoadMoreNews = new CreateRequest.Builder()
+                .setBaseUrl("https://api.vk.com/")
+                .setServiceClass(LoadMoreNews.class)
+                .build();
+
+    }
+
+    public static CreateRequest getmLoadMoreNewsApiTemplate() {
+        return mLoadMoreNews;
+    }
+
+    public static CreateRequest getCreateRequest() {
+        return mCreateRequest;
     }
 
     public static AppDB getAppDB(){
