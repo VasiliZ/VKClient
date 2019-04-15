@@ -2,8 +2,6 @@ package com.github.vasiliz.vkclient.base.services;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public final class ExecutorDataServiceImpl implements IDataExecutorService {
@@ -49,7 +47,7 @@ public final class ExecutorDataServiceImpl implements IDataExecutorService {
 
     @Override
     public <T> void doSaveToCacheTask(final ISaveToCacheTask<T> pSaveToCacheTask, final T data) {
-        Runnable runnable = new Runnable() {
+        final Runnable runnable = new Runnable() {
 
             @Override
             public void run() {

@@ -12,9 +12,9 @@ public class MainPresenterImpl extends VkPresenter<IMainView> implements IMainPr
     private NewsModel mNewsModel;
     private String mNexttNews;
 
-    public MainPresenterImpl(final IMainView pINewsView) {
+    public MainPresenterImpl(final IMainView pINewsView, final String pAccessKey) {
         mINewsView = pINewsView;
-        mNewsModel = new NewsModel(ExecutorDataServiceImpl.getInstance());
+        mNewsModel = new NewsModel(ExecutorDataServiceImpl.getInstance(), pAccessKey);
         mNewsModel.registerObserver(this);
 
     }

@@ -17,7 +17,7 @@ public final class StringUtils {
         final String[] parameters = uri.getFragment().split("&");
         for (final String s : parameters) {
             Log.d(TAG, "getAccessToken: " + s);
-            String[] parts = s.split("=");
+            final String[] parts = s.split("=");
             if (parts[0].equals(ConstantStrings.ApiVK.CHECK_ACCESS_TOKEN)) {
                 someToken = parts[1];
             }
@@ -26,13 +26,13 @@ public final class StringUtils {
         return someToken;
     }
 
-    public static String replace(String pS){
+    public static String replace(final String pS){
         return pS.replace("\"", "");
     }
 
-    public static String getDateFromLong(long pDate){
-        Date date = new Date(pDate*1000);
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    public static String getDateFromLong(final long pDate){
+        final Date date = new Date(pDate*1000);
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         return dateFormat.format(date);
     }
 }

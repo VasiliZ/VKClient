@@ -5,7 +5,7 @@ import android.util.Log;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-public class CreateRequest {
+public final class CreateRequest {
 
     private String baseUrl;
     private StringBuilder mStringBuilder = new StringBuilder();

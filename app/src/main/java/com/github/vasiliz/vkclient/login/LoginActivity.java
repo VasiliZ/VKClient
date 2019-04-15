@@ -31,7 +31,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToMainScreen() {
-        final Intent intent = new Intent(this, VkMainActivity.class);
+        Intent intent = new Intent(this, VkMainActivity.class);
+        intent.putExtra(ConstantStrings.ApiVK.TOKEN_NAME,
+                mSharedPreferences.getString(ConstantStrings.ApiVK.TOKEN_NAME, ""));
         startActivity(intent);
 
     }
@@ -54,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean checkLogin() {
-        final String token = mSharedPreferences.getString(ConstantStrings.Preferences.ACCESS_TOKEN_PREFERENCE, "");
-        return token != null;
+        final String token = mSharedPreferences.getString(ConstantStrings.ApiVK.TOKEN_NAME, "");
+        return !token.equals("");
     }
 }

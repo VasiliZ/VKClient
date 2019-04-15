@@ -1,7 +1,5 @@
 package com.github.vasiliz.vkclient.base.db.config;
 
-import android.util.Log;
-
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 
 import java.lang.annotation.Annotation;
@@ -32,11 +30,11 @@ public class VkDatabaseCreator {
         if (mClasses != null) {
             final List<String> listSql = new ArrayList<String>();
             for (final Class<?> aClass : mClasses) {
-                String headOfQuery = ConstantStrings.DB.CREATE_TABLE
+                final String headOfQuery = ConstantStrings.DB.CREATE_TABLE
                         + aClass.getSimpleName()
                         + ConstantStrings.DB.OPEN_BRACKET;
                 final Field[] fields = aClass.getDeclaredFields();
-                final List<String> tableFields = new ArrayList();
+                final List<String> tableFields = new ArrayList<String>();
                 for (final Field field : fields) {
                     final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
                     for (final Annotation annotation1 : declaredAnnotations) {
@@ -66,8 +64,8 @@ public class VkDatabaseCreator {
         }
     }
 
-    private String createCreateQuery(List<String> pList) {
-        StringBuilder stringBuilder = new StringBuilder();
+    private String createCreateQuery(final List<String> pList) {
+        final StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < pList.size(); i++) {
             stringBuilder
                     .append(pList.get(i))

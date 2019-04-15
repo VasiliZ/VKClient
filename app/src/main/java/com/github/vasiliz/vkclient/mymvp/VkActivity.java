@@ -38,11 +38,4 @@ public abstract class VkActivity extends AppCompatActivity implements VkBaseView
         super.onDestroy();
 
     }
-
-    public boolean isVisible(final View pView) {
-        if (pView!=null) {
-            return pView.getVisibility() == View.VISIBLE;
-        }
-        return false;
-    }
 }

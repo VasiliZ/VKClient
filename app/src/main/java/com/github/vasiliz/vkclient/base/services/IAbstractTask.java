@@ -11,7 +11,6 @@ public abstract class IAbstractTask<T>
         ISaveToCacheTask<T> {
 
     private final IDataExecutorService mIDataExecutorService;
-    private T mResult;
     private boolean isLoadMoreData;
 
     public IAbstractTask(final IDataExecutorService pIDataExecutorService) {
@@ -22,10 +21,10 @@ public abstract class IAbstractTask<T>
     @Override
     public void runNetwork() {
         try {
-            mResult = executeNetwork(isLoadMoreData);
-            if (mResult != null) {
-                saveToCache(mResult);
-                runOnUIThread(mResult);
+            final T result = executeNetwork(isLoadMoreData);
+            if (result != null) {
+                saveToCache(result);
+                runOnUIThread(result);
             } else {
                 runLocal();
             }
@@ -62,7 +61,7 @@ public abstract class IAbstractTask<T>
         mIDataExecutorService.doSaveToCacheTask(this, pData);
     }
 
-    public void doTask(boolean pLoadMore){
+    public void doTask(final boolean pLoadMore){
         isLoadMoreData = pLoadMore;
         mIDataExecutorService.doNetworkTask(this);
     }

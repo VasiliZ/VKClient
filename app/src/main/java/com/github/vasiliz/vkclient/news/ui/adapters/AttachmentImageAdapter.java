@@ -37,7 +37,7 @@ public class AttachmentImageAdapter extends RecyclerView.Adapter<AttachmentImage
 
     @Override
     public void onBindViewHolder(@NonNull final ImagesAttachmentHolder pImagesAttachmentHolder, final int pI) {
-        Photo photo = mPhotos.get(pI);
+        final Photo photo = mPhotos.get(pI);
         if (photo.getPhoto1280()!=null) {
             ImageLoader.getInstance()
                     .with(mLayoutInflater.getContext())

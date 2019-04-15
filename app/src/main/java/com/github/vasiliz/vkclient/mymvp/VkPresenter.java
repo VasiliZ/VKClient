@@ -6,7 +6,7 @@ public class VkPresenter<View extends VkBaseView> {
 
     private WeakReference<View> mReference;
 
-    public void attachView(final View pView){
+    void attachView(final View pView){
         this.mReference = new WeakReference<View>(pView);
     }
 

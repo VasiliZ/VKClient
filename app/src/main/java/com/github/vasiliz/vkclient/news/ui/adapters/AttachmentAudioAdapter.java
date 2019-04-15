@@ -32,7 +32,7 @@ public class AttachmentAudioAdapter extends RecyclerView.Adapter<AttachmentAudio
 
     @Override
     public void onBindViewHolder(@NonNull final AudioItemHolder pAudioItemHolder, final int pI) {
-        Audio audio = mAudios.get(pI);
+        final Audio audio = mAudios.get(pI);
         pAudioItemHolder.mTextView.setText(audio.getArtist());
     }
 

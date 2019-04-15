@@ -26,18 +26,19 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
     private final Collection<Observer> mObservers = new ArrayList<Observer>();
 
     private static final String TAG = NewsModel.class.getSimpleName();
-    private AppDB mAppDB = VkApplication.getAppDB();
-    private String FILTERS = "post";
-    private String ACCESS_TOKEN = "5401b44b25958826793dc6ca3ea87f17958cf7ba4a316af4c89acdb5c2d24559f090d8a2511f336149de6";
-    private String VERSION = "5.69";
+    private final AppDB mAppDB = VkApplication.getAppDB();
+    private final String FILTERS = "post";
+    private String mAccessToken;
+    private final String VERSION = "5.69";
     String mNextFromNews;
 
-    private CreateRequest mCreateRequest = VkApplication.getCreateRequest();
-    private CreateRequest mLoadMoreNews = VkApplication.getmLoadMoreNewsApiTemplate();
+    private final CreateRequest mCreateRequest = VkApplication.getCreateRequest();
+    private final CreateRequest mLoadMoreNews = VkApplication.getmLoadMoreNewsApiTemplate();
 
-    public NewsModel(final IDataExecutorService pIDataExecutorService) {
+    public NewsModel(final IDataExecutorService pIDataExecutorService, final String pAccessToken) {
         super(pIDataExecutorService);
 
+        mAccessToken = pAccessToken;
     }
 
     @Override
@@ -52,12 +53,12 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
 
         try {
             if (pLoadMore) {
-                final String tamplateApi = mLoadMoreNews.getTamplateApiString();
-                Log.d(TAG, "executeNetwork: " + tamplateApi);
-                inputStream = new HttpInputStreamProvider().get(String.format(tamplateApi, FILTERS, ACCESS_TOKEN, mNextFromNews, VERSION));
+                final String templateApi = mLoadMoreNews.getTamplateApiString();
+                Log.d(TAG, "executeNetwork: " + templateApi);
+                inputStream = new HttpInputStreamProvider().get(String.format(templateApi, FILTERS, mAccessToken, mNextFromNews, VERSION));
             } else {
                 final String tamplateApi = mCreateRequest.getTamplateApiString();
-                inputStream = new HttpInputStreamProvider().get(String.format(tamplateApi, FILTERS, ACCESS_TOKEN, VERSION));
+                inputStream = new HttpInputStreamProvider().get(String.format(tamplateApi, FILTERS, mAccessToken, VERSION));
             }
             byteArrayOutputStream = new ByteArrayOutputStream();
             int res = inputStream.read();

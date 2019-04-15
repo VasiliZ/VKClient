@@ -1,5 +1,6 @@
 package com.github.vasiliz.vkclient.news.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -7,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.github.vasiliz.vkclient.R;
+import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.github.vasiliz.vkclient.mymvp.VkActivity;
 import com.github.vasiliz.vkclient.mymvp.VkPresenter;
 import com.github.vasiliz.vkclient.news.MainPresenterImpl;
@@ -21,7 +23,7 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
     private NewsAdapter mNewsAdapter;
     private boolean isLastPage;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
+    private String mAccessKey;
     private boolean isLoading;
     public static int PAGE_START = 1;
     private int currentPage = PAGE_START;
@@ -38,6 +40,7 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vk_main_layout);
+
         mRecyclerView = findViewById(R.id.news_recycler_view);
         mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
         mIMainPresenter.loadNews();
@@ -47,7 +50,11 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
 
     @Override
     protected VkPresenter initPresenter() {
-        return mIMainPresenter = new MainPresenterImpl(this);
+        Intent intent = getIntent();
+        mAccessKey = intent
+                .getStringExtra(ConstantStrings.ApiVK.TOKEN_NAME);
+        return mIMainPresenter =
+                new MainPresenterImpl(this, mAccessKey);
     }
 
     public void initRecyclerView() {
@@ -95,7 +102,5 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
     public SwipeRefreshLayout handleSwipe() {
         return mSwipeRefreshLayout;
     }
-
-
 
 }
