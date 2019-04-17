@@ -22,7 +22,6 @@ public class CircleImage extends AppCompatImageView {
     private int mBorderColor;
     private int mImageResourse;
     private int mImageSise;
-    private Drawable mDrawable;
     private Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private RectF mRectF = new RectF();
@@ -68,35 +67,6 @@ public class CircleImage extends AppCompatImageView {
         }
     }
 
-    private void createDrawable() {
-        mDrawable = new Drawable() {
-
-            @Override
-            public void draw(Canvas canvas) {
-                int centerX = Math.round(canvas.getWidth() * 0.5f);
-                int centerY = Math.round(canvas.getHeight() * 0.5f);
-
-                canvas.drawCircle(centerX, centerY, canvas.getHeight() / 2, mPaint);
-                canvas.drawCircle(centerX, centerY, canvas.getHeight() / 2, mBorderPaint);
-            }
-
-            @Override
-            public void setAlpha(int alpha) {
-
-            }
-
-            @Override
-            public void setColorFilter(ColorFilter colorFilter) {
-
-            }
-
-            @Override
-            public int getOpacity() {
-                return PixelFormat.UNKNOWN;
-            }
-        };
-    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -108,7 +78,6 @@ public class CircleImage extends AppCompatImageView {
     @Override
     protected void onDraw(Canvas canvas) {
         mPaint.setColor(BLACK);
-        createDrawable();
         float borderWidth = 1f;
         canvas.drawCircle(mRectF.centerX(), mRectF.centerY(), (mRectF.height() / 2) - borderWidth, mPaint);
         canvas.drawCircle(mRectF.centerX(), mRectF.centerY(), (mRectF.height() / 2) - borderWidth, mBorderPaint);
