@@ -203,6 +203,7 @@ public final class AppDB {
                 .append(pClass.getSimpleName());
         final SQLiteDatabase database = mDBHelper.getReadableDatabase();
         if (pLimit != 0) {
+            selectBuilder.append(" order by id desc ");
             selectBuilder.append(LIMIT).append(pLimit);
         }
 
@@ -256,18 +257,18 @@ public final class AppDB {
             while (cursor.moveToNext()) {
                 final Item item = new Item();
                 item.setAttachments((List<Attachment>) getGson()
-                        .fromJson(cursor.getString(0),
+                        .fromJson(cursor.getString(1),
                                 new TypeToken<ArrayList<Attachment>>() {}.getType()));
-                item.setComments(getGson().fromJson(cursor.getString(1), Comments.class));
-                item.setDate(cursor.getInt(2));
-                item.setLikes(getGson().fromJson(cursor.getString(3), Likes.class));
-                item.setPostId(cursor.getInt(4));
-                item.setPostType(cursor.getString(5));
-                item.setReposts(getGson().fromJson(cursor.getString(6), Reposts.class));
-                item.setSourseId(cursor.getInt(7));
-                item.setText(cursor.getString(8));
-                item.setType(cursor.getString(9));
-                item.setViews(getGson().fromJson(cursor.getString(10), Views.class));
+                item.setComments(getGson().fromJson(cursor.getString(2), Comments.class));
+                item.setDate(cursor.getInt(3));
+                item.setLikes(getGson().fromJson(cursor.getString(4), Likes.class));
+                item.setPostId(cursor.getInt(5));
+                item.setPostType(cursor.getString(6));
+                item.setReposts(getGson().fromJson(cursor.getString(7), Reposts.class));
+                item.setSourseId(cursor.getInt(8));
+                item.setText(cursor.getString(9));
+                item.setType(cursor.getString(10));
+                item.setViews(getGson().fromJson(cursor.getString(11), Views.class));
                 items.add(item);
             }
         }

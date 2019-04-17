@@ -38,7 +38,10 @@ public class VkDatabaseCreator {
                 for (final Field field : fields) {
                     final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
                     for (final Annotation annotation1 : declaredAnnotations) {
-
+                        if (annotation1 instanceof Id){
+                            String idField = "id" +  ConstantStrings.DB.CREATE_ID_COLUMN;
+                            tableFields.add(idField);
+                        }
                         if (annotation1 instanceof com.github.vasiliz.vkclient.base.db.config.Field) {
                             if (field.getType().equals(String.class)) {
                                 final String textFiels = field.getName()

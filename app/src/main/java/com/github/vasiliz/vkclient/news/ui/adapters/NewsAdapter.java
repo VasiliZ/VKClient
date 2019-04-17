@@ -142,13 +142,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
             if (groups != null) {
                 mImageLoader
                         .with(mLayoutInflater.getContext())
-                        .load(groups.getUrlGroupPhoto50())
+                        .load(groups.getUrlGroupPhoto100())
                         .into(mCircleView);
                 mName.setText(groups.getNameGroup());
-            } else {
+            } else if (profile != null){
+
                 mImageLoader
                         .with(mLayoutInflater.getContext())
-                        .load(profile.getUrlPhoto50())
+                        .load(profile.getUrlPhoto100())
                         .into(mCircleView);
                 mName.setText(String
                         .format(profile.getFirstName() + "%s" + profile.getLastName(), " "));

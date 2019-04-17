@@ -10,6 +10,8 @@ import java.util.List;
 @Table
 public class Item {
 
+    @Id
+    private Long mLong;
     @Field
     @SerializedName("type")
     private String mType;
