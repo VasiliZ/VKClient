@@ -1,1 +1,3 @@
-include ':app', ':app-debug'
+include ':app', ':app-debug', ':loader', ':expandable_text_view'
+project(':loader').projectDir = new File('ImageLoader/app')
+project(':expandable_text_view').projectDir = new File('ExpandableTextView/app')

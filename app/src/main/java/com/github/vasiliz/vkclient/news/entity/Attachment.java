@@ -2,7 +2,6 @@ package com.github.vasiliz.vkclient.news.entity;
 
 import com.google.gson.annotations.SerializedName;
 
-
 public class Attachment {
 
     @SerializedName("type")
@@ -20,48 +19,24 @@ public class Attachment {
     @SerializedName("doc")
     private Doc mDoc;
 
-    public Attachment() {
-
-    }
-
     public Doc getDoc() {
         return mDoc;
-    }
-
-    public Attachment setDoc(Doc pDoc) {
-        mDoc = pDoc;
-        return this;
     }
 
     public String getTypeAttachments() {
         return mTypeAttachments;
     }
 
-    public void setTypeAttachments(final String pTypeAttachments) {
-        mTypeAttachments = pTypeAttachments;
-    }
-
     public Photo getPhoto() {
         return mPhoto;
-    }
-
-    public void setPhoto(final Photo pPhoto) {
-        mPhoto = pPhoto;
     }
 
     public Audio getAudio() {
         return mAudio;
     }
 
-    public void setAudio(final Audio pAudio) {
-        mAudio = pAudio;
-    }
-
     public Video getVideo() {
         return mVideo;
     }
 
-    public void setVideo(final Video pVideo) {
-        mVideo = pVideo;
-    }
 }

@@ -15,14 +15,14 @@ public class VkDatabaseCreator {
     private Class[] mClasses;
 
     public String getDatabaseName(final AnnotatedElement pClass) {
-        try {
 
-            final Annotation annotation = pClass.getAnnotation(Database.class);
+        final Annotation annotation = pClass.getAnnotation(Database.class);
+        if (annotation != null) {
             final String nameDB = (((Database) annotation).databaseName());
             mClasses = ((Database) annotation).entity();
             return nameDB;
-        } catch (final Exception pE) {
-            throw new IllegalArgumentException("no annotated class");
+        } else {
+            throw new RuntimeException("@Database annotation missing");
         }
     }
 
@@ -30,36 +30,17 @@ public class VkDatabaseCreator {
         if (mClasses != null) {
             final List<String> listSql = new ArrayList<String>();
             for (final Class<?> aClass : mClasses) {
-                final String headOfQuery = ConstantStrings.DB.CREATE_TABLE
-                        + aClass.getSimpleName()
-                        + ConstantStrings.DB.OPEN_BRACKET;
+                final String headOfQuery = getNameTable(aClass);
                 final Field[] fields = aClass.getDeclaredFields();
-                final List<String> tableFields = new ArrayList<String>();
+                final List<String> listWithAllTableFields = new ArrayList<String>();
+                final StringBuilder builder = new StringBuilder();
                 for (final Field field : fields) {
-                    final Annotation[] declaredAnnotations = field.getDeclaredAnnotations();
-                    for (final Annotation annotation1 : declaredAnnotations) {
-                        if (annotation1 instanceof Id){
-                            String idField = "id" +  ConstantStrings.DB.CREATE_ID_COLUMN;
-                            tableFields.add(idField);
-                        }
-                        if (annotation1 instanceof com.github.vasiliz.vkclient.base.db.config.Field) {
-                            if (field.getType().equals(String.class)) {
-                                final String textFiels = field.getName()
-                                        + ConstantStrings.DB.Type.TEXT;
-                                tableFields.add(textFiels);
-                            } else if ((field.getType().equals(int.class))
-                                    || (field.getType().equals(long.class))) {
-                                final String intField = field.getName() + ConstantStrings.DB.Type.INTEGER;
-                                tableFields.add(intField);
-                            } else {
-                                final String otherFields = field.getName() + ConstantStrings.DB.Type.TEXT;
-                                tableFields.add(otherFields);
-                            }
-                        }
+                    for (final Annotation annotation1 : field.getDeclaredAnnotations()) {
+                        createTableFields(annotation1, field, listWithAllTableFields);
                     }
                 }
-                Collections.sort(tableFields);
-                listSql.add(headOfQuery + createCreateQuery(tableFields) + ConstantStrings.DB.END_OF_QUERY);
+                Collections.sort(listWithAllTableFields);
+                listSql.add(headOfQuery + createQuery(listWithAllTableFields, builder) + ConstantStrings.DB.END_OF_QUERY);
             }
             return listSql;
         } else {
@@ -67,15 +48,41 @@ public class VkDatabaseCreator {
         }
     }
 
-    private String createCreateQuery(final List<String> pList) {
-        final StringBuilder stringBuilder = new StringBuilder();
+    private void createTableFields(final Annotation pDeclaredAnnotations, final Field pField, final List<String> pListForFields) {
+
+        //noinspection ChainOfInstanceofChecks
+        //todo переделать ID на что нибудь другое
+        if (pDeclaredAnnotations instanceof Id) {
+            pListForFields.add("id" + ConstantStrings.DB.CREATE_ID_COLUMN);
+        }
+        if (pDeclaredAnnotations instanceof com.github.vasiliz.vkclient.base.db.config.Field) {
+            if (pField.getType().equals(String.class)) {
+                pListForFields.add( pField.getName()
+                        + ConstantStrings.DB.Type.TEXT);
+            } else if ((pField.getType().equals(int.class))
+                    || (pField.getType().equals(long.class))) {
+                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.INTEGER);
+            } else {
+                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.TEXT);
+            }
+        }
+    }
+
+    private String createQuery(final List<String> pList, final StringBuilder pStringBuilder) {
+
         for (int i = 0; i < pList.size(); i++) {
-            stringBuilder
+            pStringBuilder
                     .append(pList.get(i))
                     .append(ConstantStrings.DB.COMMA);
         }
-        stringBuilder.delete(stringBuilder.length()-1, stringBuilder.length());
-        return stringBuilder.toString();
+        pStringBuilder.delete(pStringBuilder.length() - 1, pStringBuilder.length());
+        return pStringBuilder.toString();
+    }
+
+    private String getNameTable(final Class<?> pClass) {
+        return ConstantStrings.DB.CREATE_TABLE
+                + pClass.getSimpleName()
+                + ConstantStrings.DB.OPEN_BRACKET;
     }
 
 }

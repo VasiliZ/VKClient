@@ -17,7 +17,6 @@ public abstract class PaginationScrollListener extends RecyclerView.OnScrollList
     @Override
     public void onScrolled(@NonNull final RecyclerView recyclerView, final int dx, final int dy) {
         super.onScrolled(recyclerView, dx, dy);
-
         final int visibleCount = mLinearLayoutManager.getChildCount();
         final int totalItemCount = mLinearLayoutManager.getItemCount()-10;
 

@@ -32,12 +32,14 @@ public class MainPresenterImpl extends VkPresenter<IMainView> implements IMainPr
 
     @Override
     public void notification(final Response pMessage) {
-        mNexttNews = pMessage.getResponseNews().getNextNews();
-        mINewsView.setDataToAdapter(pMessage);
-        mINewsView.dataLastPage(true);
-        mINewsView.loadMoreData(false);
-        if (mINewsView.handleSwipe()!=null) {
-            mINewsView.handleSwipe().setRefreshing(false);
+        if (pMessage!=null) {
+            mNexttNews = pMessage.getResponseNews().getNextNews();
+            mINewsView.setDataToAdapter(pMessage);
+            mINewsView.dataLastPage(true);
+            mINewsView.loadMoreData(false);
+            if (mINewsView.handleSwipe() != null) {
+                mINewsView.handleSwipe().setRefreshing(false);
+            }
         }
     }
 }

@@ -1,12 +1,11 @@
 package com.github.vasiliz.vkclient.base.api;
 
-import android.util.Log;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 public final class CreateRequest {
 
+    //TODO подумай о хорошем, о кодогенирации
     private String baseUrl;
     private StringBuilder mStringBuilder = new StringBuilder();
     private String TAG = CreateRequest.class.getSimpleName();
@@ -16,20 +15,22 @@ public final class CreateRequest {
 
     private void buildApiTemplate(final Class service) {
 
-        try {
-            mStringBuilder.append(baseUrl);
-            final Method[] methods = service.getMethods();
-            for (final Method method : methods) {
-                final Annotation annotation = method.getAnnotation(GET.class);
-                if (annotation instanceof GET) {
-                    final GET get = (GET) annotation;
-                    get.method();
-                    mStringBuilder.append(get.method())
-                            .append("?");
-                }
-                final Annotation[][] parameterAnnotation = method.getParameterAnnotations();
-                for (final Annotation[] annotations : parameterAnnotation) {
-                    for (final Annotation annotation1 : annotations) {
+        mStringBuilder.append(baseUrl);
+        final Method[] methods = service.getMethods();
+        for (final Method method : methods) {
+            final GET annotation = method.getAnnotation(GET.class);
+            if (annotation != null) {
+                mStringBuilder.append(annotation.method())
+                        .append("?");
+            } else {
+                throw new RuntimeException("The following annotations are necessary for correct work: @GET");
+            }
+
+            //Todo to another method maybe
+            final Annotation[][] parameterAnnotation = method.getParameterAnnotations();
+            for (final Annotation[] annotations : parameterAnnotation) {
+                for (final Annotation annotation1 : annotations) {
+                    if (annotation1 instanceof Query) {
                         final Query query = (Query) annotation1;
                         mStringBuilder.append(query.value())
                                 .append("=")
@@ -38,10 +39,9 @@ public final class CreateRequest {
                     }
                 }
             }
-            mStringBuilder.delete(mStringBuilder.length()-1, mStringBuilder.length());
-        } catch (final Exception e) {
-            Log.d(TAG, "buildApiTemplate: " + "don't find annotations for work with api");
         }
+        mStringBuilder.delete(mStringBuilder.length() - 1, mStringBuilder.length());
+
     }
 
     public String getTamplateApiString() {

@@ -26,11 +26,11 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
     private final Collection<Observer> mObservers = new ArrayList<Observer>();
 
     private static final String TAG = NewsModel.class.getSimpleName();
-    private final AppDB mAppDB = VkApplication.getAppDB();
+    private final AppDB mAppDB = AppDB.getAppDBInstance();
     private final String FILTERS = "post";
     private String mAccessToken;
     private final String VERSION = "5.69";
-    String mNextFromNews;
+    private String mNextFromNews;
 
     private final CreateRequest mCreateRequest = VkApplication.getCreateRequest();
     private final CreateRequest mLoadMoreNews = VkApplication.getmLoadMoreNewsApiTemplate();

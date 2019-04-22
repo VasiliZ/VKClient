@@ -15,15 +15,7 @@ public class Reposts {
         return mCountReposts;
     }
 
-    public void setCountReposts(final long pCountReposts) {
-        mCountReposts = pCountReposts;
-    }
-
     public int getUserReposted() {
         return mUserReposted;
-    }
-
-    public void setUserReposted(final int pUserReposted) {
-        mUserReposted = pUserReposted;
     }
 }

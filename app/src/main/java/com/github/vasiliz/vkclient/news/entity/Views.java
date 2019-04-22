@@ -13,8 +13,4 @@ public class Views {
     public long getCountViews() {
         return mCountViews;
     }
-
-    public void setCountViews(final long pCountViews) {
-        mCountViews = pCountViews;
-    }
 }

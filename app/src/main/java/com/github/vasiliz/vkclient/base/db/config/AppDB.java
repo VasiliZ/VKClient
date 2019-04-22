@@ -3,6 +3,8 @@ package com.github.vasiliz.vkclient.base.db.config;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.github.vasiliz.vkclient.VkApplication;
+import com.github.vasiliz.vkclient.base.utils.CursorUtils;
 import com.github.vasiliz.vkclient.base.utils.StringUtils;
 import com.github.vasiliz.vkclient.news.entity.Attachment;
 import com.github.vasiliz.vkclient.news.entity.Comments;
@@ -30,11 +32,7 @@ import java.util.List;
 public final class AppDB {
 
     private final DBHelper mDBHelper;
-    private static AppDB mAppDB;
-    private static VkDBConfig mVkDBConfig;
-    private static List<String> mQueryes;
     private final String TAG = AppDB.class.getSimpleName();
-    private SQLiteDatabase database;
     private static final String COMMA = ",";
     private static final String QUOTE = "\"";
     private static final String SINGLE_QUOTE = "\'";
@@ -45,23 +43,22 @@ public final class AppDB {
     private static final String VALUES = " VALUES ";
     private static final String SELECT_FROM = "Select * from ";
     private static final String LIMIT = " LIMIT ";
+    private static AppDB INSTANCE;
 
     private AppDB() {
-        mDBHelper = new DBHelper(mVkDBConfig, mQueryes);
+        mDBHelper = VkApplication.getDBHelper();
         mDBHelper.getWritableDatabase();
     }
 
-    public static synchronized AppDB getInstanceDB(final VkDBConfig pVkDBConfig, final List<String> pQueryes) {
-        if (mAppDB == null) {
-            mVkDBConfig = pVkDBConfig;
-            mQueryes = pQueryes;
-            mAppDB = new AppDB();
+    public static synchronized AppDB getAppDBInstance() {
+        if (INSTANCE == null) {
+            return INSTANCE = new AppDB();
         }
-        return mAppDB;
+        return INSTANCE;
     }
 
     public void writeData(final Response pResponse) {
-        database = mAppDB.mDBHelper.getWritableDatabase();
+        final SQLiteDatabase database = mDBHelper.getWritableDatabase();
         try {
             database.beginTransaction();
             final List<Groups> groups = pResponse.getResponseNews().getGroupsList();
@@ -87,7 +84,7 @@ public final class AppDB {
 
         final StringBuilder stringBuilder = new StringBuilder();
         final Field[] fields = pAnyClass.getDeclaredFields();
-        final List<String> nameFields = new ArrayList();
+        final List<String> nameFields = new ArrayList<String>();
         stringBuilder.append(INSERT)
                 .append(pAnyClass.getSimpleName())
                 .append(OPEN_BRACKET);
@@ -193,6 +190,7 @@ public final class AppDB {
         responseNews.setProfileList(getAllProfiles());
         responseNews.setItemList(getAllItems());
         response.setResponseNews(responseNews);
+
         return response;
     }
 
@@ -211,69 +209,85 @@ public final class AppDB {
     }
 
     private List<Groups> getAllGroups() {
+
         final List<Groups> groups = new ArrayList<Groups>();
         final Cursor cursor = getCursorForSelectAllData(Groups.class, 0);
-        if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
-                final Groups group = new Groups();
-                group.setId(cursor.getInt(0));
-                group.setIsClosed(cursor.getInt(1));
-                group.setNameGroup(cursor.getString(2));
-                group.setScreenName(cursor.getString(3));
-                group.setType(cursor.getString(4));
-                group.setUrlGroupPhoto100(cursor.getString(5));
-                group.setUrlGroupPhoto200(cursor.getString(6));
-                group.setUrlGroupPhoto50(cursor.getString(7));
-                groups.add(group);
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    final Groups group = new Groups();
+                    group.setId(cursor.getInt(0));
+                    group.setIsClosed(cursor.getInt(1));
+                    group.setNameGroup(cursor.getString(2));
+                    group.setScreenName(cursor.getString(3));
+                    group.setType(cursor.getString(4));
+                    group.setUrlGroupPhoto100(cursor.getString(5));
+                    group.setUrlGroupPhoto200(cursor.getString(6));
+                    group.setUrlGroupPhoto50(cursor.getString(7));
+                    groups.add(group);
+                } while (cursor.moveToNext());
             }
+            return groups;
+        } finally {
+            CursorUtils.closeCursor(cursor);
         }
-        return groups;
     }
 
     private List<Profile> getAllProfiles() {
         final Cursor cursor = getCursorForSelectAllData(Profile.class, 0);
         final List<Profile> profiles = new ArrayList<Profile>();
-        if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
-                final Profile profile = new Profile();
-                profile.setFirstName(cursor.getString(0));
-                profile.setId(cursor.getInt(1));
-                profile.setLastName(cursor.getString(2));
-                profile.setOnline(cursor.getInt(3));
-                profile.setScreenName(cursor.getString(4));
-                profile.setSex(cursor.getString(5));
-                profile.setUrlPhoto100(cursor.getString(6));
-                profile.setUrlPhoto50(cursor.getString(7));
-                profiles.add(profile);
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    final Profile profile = new Profile();
+                    profile.setFirstName(cursor.getString(0));
+                    profile.setId(cursor.getInt(1));
+                    profile.setLastName(cursor.getString(2));
+                    profile.setOnline(cursor.getInt(3));
+                    profile.setScreenName(cursor.getString(4));
+                    profile.setSex(cursor.getString(5));
+                    profile.setUrlPhoto100(cursor.getString(6));
+                    profile.setUrlPhoto50(cursor.getString(7));
+                    profiles.add(profile);
+                } while (cursor.moveToNext());
             }
+            return profiles;
+        } finally {
+            CursorUtils.closeCursor(cursor);
         }
-        return profiles;
     }
 
     private List<Item> getAllItems() {
         final Cursor cursor = getCursorForSelectAllData(Item.class, 50);
         final List<Item> items = new ArrayList<Item>();
-        if (cursor.moveToFirst()) {
-            while (cursor.moveToNext()) {
-                final Item item = new Item();
-                item.setAttachments((List<Attachment>) getGson()
-                        .fromJson(cursor.getString(1),
-                                new TypeToken<ArrayList<Attachment>>() {}.getType()));
-                item.setComments(getGson().fromJson(cursor.getString(2), Comments.class));
-                item.setDate(cursor.getInt(3));
-                item.setLikes(getGson().fromJson(cursor.getString(4), Likes.class));
-                item.setPostId(cursor.getInt(5));
-                item.setPostType(cursor.getString(6));
-                item.setReposts(getGson().fromJson(cursor.getString(7), Reposts.class));
-                item.setSourseId(cursor.getInt(8));
-                item.setText(cursor.getString(9));
-                item.setType(cursor.getString(10));
-                item.setViews(getGson().fromJson(cursor.getString(11), Views.class));
-                items.add(item);
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    final Item item = new Item();
+                    //noinspection unchecked
+                    item.setAttachments((List<Attachment>) getGson()
+                            .fromJson(cursor.getString(1),
+                                    new TypeToken<ArrayList<Attachment>>() {
+
+                                    }.getType()));
+                    item.setComments(getGson().fromJson(cursor.getString(2), Comments.class));
+                    item.setDate(cursor.getInt(3));
+                    item.setLikes(getGson().fromJson(cursor.getString(4), Likes.class));
+                    item.setPostId(cursor.getInt(5));
+                    item.setPostType(cursor.getString(6));
+                    item.setReposts(getGson().fromJson(cursor.getString(7), Reposts.class));
+                    item.setSourseId(cursor.getInt(8));
+                    item.setText(cursor.getString(9));
+                    item.setType(cursor.getString(10));
+                    item.setViews(getGson().fromJson(cursor.getString(11), Views.class));
+                    items.add(item);
+                } while (cursor.moveToNext());
             }
+            Collections.reverse(items);
+            return items;
+        } finally {
+            CursorUtils.closeCursor(cursor);
         }
-        Collections.reverse(items);
-        return items;
     }
 
     private Gson getGson() {

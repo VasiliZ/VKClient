@@ -7,9 +7,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.github.vasiliz.myapplication.ExpandableTextView;
 import com.github.vasiliz.myimageloader.ImageLoader;
 import com.github.vasiliz.vkclient.R;
 import com.github.vasiliz.vkclient.VkApplication;
@@ -55,6 +57,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull final BaseViewHolder pViewHolder, final int pPosition) {
+        pViewHolder.setIsRecyclable(true);
         pViewHolder.onBind(pPosition);
 
     }
@@ -94,7 +97,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
     class NewsViewHolder extends BaseViewHolder {
 
         private final CircleImage mCircleView;
-        private final TextView mTextNews;
+        private final ExpandableTextView mTextNews;
         private final TextView mName;
         private final TextView mDate;
         private final TextView mLikeText;
@@ -123,6 +126,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
             mAudioContainer = itemView.findViewById(R.id.audio_container);
             mDocContainer = itemView.findViewById(R.id.doc_container);
 
+
         }
 
         @Override
@@ -132,13 +136,11 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
 
         @Override
         public void onBind(final int pPosition) {
-            super.onBind(pPosition);
-
             final Item item = mItems.get(pPosition);
             final Groups groups = getGroup(item);
             final Profile profile = getProfile(item);
 
-            mTextNews.setText(item.getText());
+
             if (groups != null) {
                 mImageLoader
                         .with(mLayoutInflater.getContext())
@@ -155,6 +157,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
                         .format(profile.getFirstName() + "%s" + profile.getLastName(), " "));
             }
 
+            mTextNews.setContent(item.getText());
+
             mCircleView.setImageResource(R.drawable.test_drawable);
 
             mDate.setText(StringUtils.getDateFromLong(item.getDate()));
@@ -165,7 +169,8 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
             mLikeText.setText(String.valueOf(item.getLikes().getCountLike()));
 
             //attachments content
-
+//todo кастомная вьюшка с линеаром заинфлейтить туда ресайклеры по требованию, ограничение по количеству элементов в адаптере, грид на картинки
+            //todo попробовать всадить все в один ресайклет с итем тайпами
             if (item.getAttachments() == null) {
                 mImageContainer.setVisibility(View.GONE);
                 mAudioContainer.setVisibility(View.GONE);
@@ -257,6 +262,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
                 mCommentContainer.setVisibility(View.GONE);
             }
         }
+
     }
 
     public void setItems(final Response pResponseNews) {
@@ -264,21 +270,17 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.BaseViewHolder
         final List<Groups> groups = pResponseNews.getResponseNews().getGroupsList();
         final List<Profile> profiles = pResponseNews.getResponseNews().getProfileList();
 
-        for (Item item : items) {
+        for (final Item item : items) {
             add(item);
         }
 
         mGroups.addAll(groups);
         mProfiles.addAll(profiles);
 
-        items.clear();
-        groups.clear();
-        profiles.clear();
-
         notifyDataSetChanged();
     }
 
-    private void add(Item pItem) {
+    private void add(final Item pItem) {
         mItems.add(pItem);
         notifyItemInserted(mItems.size() - 1);
     }

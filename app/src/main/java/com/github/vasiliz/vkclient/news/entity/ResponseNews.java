@@ -2,6 +2,7 @@ package com.github.vasiliz.vkclient.news.entity;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Collections;
 import java.util.List;
 
 public class ResponseNews {
@@ -12,21 +13,17 @@ public class ResponseNews {
     @SerializedName("groups")
     private List<Groups> mGroupsList;
     @SerializedName("next_from")
-    private String mNewtNews;
+    private String mNextNews;
 
     public ResponseNews() {
     }
 
     public String getNextNews() {
-        return mNewtNews;
-    }
-
-    public ResponseNews(final List<Item> pItemList) {
-        mItemList = pItemList;
+        return mNextNews;
     }
 
     public List<Item> getItemList() {
-        return mItemList;
+        return Collections.unmodifiableList(mItemList);
     }
 
     public void setItemList(final List<Item> pItemList) {
@@ -34,7 +31,7 @@ public class ResponseNews {
     }
 
     public List<Profile> getProfileList() {
-        return mProfileList;
+        return Collections.unmodifiableList(mProfileList);
     }
 
     public void setProfileList(final List<Profile> pProfileList) {
@@ -42,7 +39,7 @@ public class ResponseNews {
     }
 
     public List<Groups> getGroupsList() {
-        return mGroupsList;
+        return Collections.unmodifiableList(mGroupsList);
     }
 
     public void setGroupsList(final List<Groups> pGroupsList) {

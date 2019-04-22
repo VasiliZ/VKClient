@@ -16,26 +16,12 @@ public class Doc {
         return mPreview;
     }
 
-    public Doc setPreview(Preview pPreview) {
-        mPreview = pPreview;
-        return this;
-    }
-
     public String getTitle() {
         return mTitle;
-    }
-
-    public Doc setTitle(String pTitle) {
-        mTitle = pTitle;
-        return this;
     }
 
     public String getUrl() {
         return mUrl;
     }
 
-    public Doc setUrl(String pUrl) {
-        mUrl = pUrl;
-        return this;
-    }
 }

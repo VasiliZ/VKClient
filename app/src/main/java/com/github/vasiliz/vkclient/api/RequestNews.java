@@ -1,5 +1,7 @@
 package com.github.vasiliz.vkclient.api;
 
+import android.support.annotation.Nullable;
+
 import com.github.vasiliz.vkclient.base.api.GET;
 import com.github.vasiliz.vkclient.base.api.Query;
 

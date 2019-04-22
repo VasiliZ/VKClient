@@ -13,17 +13,8 @@ public class Video {
         return mSource;
     }
 
-    public Video setSource(final String pSource) {
-        mSource = pSource;
-        return this;
-    }
-
     public String getUrlPhotoVideo() {
         return mUrlPhotoVideo;
     }
 
-    public Video setUrlPhotoVideo(final String pUrlPhotoVideo) {
-        mUrlPhotoVideo = pUrlPhotoVideo;
-        return this;
-    }
 }

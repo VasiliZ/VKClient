@@ -14,8 +14,4 @@ public class Audio {
         return mArtist;
     }
 
-    public void setArtist(final String pArtist) {
-        mArtist = pArtist;
-    }
-
 }

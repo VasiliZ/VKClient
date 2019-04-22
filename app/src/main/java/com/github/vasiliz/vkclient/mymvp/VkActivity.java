@@ -23,6 +23,7 @@ public abstract class VkActivity extends AppCompatActivity implements VkBaseView
     @Override
     protected void onResume() {
         super.onResume();
+       //TODO посмотри как можно избавится от mVkPresenter.onResume(); и тд с помощью  getLifecycle()
         mVkPresenter.onResume();
     }
 

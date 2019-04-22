@@ -6,17 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.List;
 
 public final class VkDBConfig {
-
-    private Context mContext;
     private String mDbName;
     private List<String> listQueryForCreateTables;
     private SQLiteDatabase.CursorFactory mCursorFactory;
     private int mVersion;
 
 
-    public Context getContext() {
-        return mContext;
-    }
 
     public String getDbName() {
         return mDbName;
@@ -73,7 +68,6 @@ public final class VkDBConfig {
 
         public VkDBConfig build() {
             final VkDBConfig vkDBConfig = new VkDBConfig();
-            vkDBConfig.mContext = this.mContext;
             vkDBConfig.mDbName = this.mDbName;
             vkDBConfig.mVersion = this.mVersion;
             vkDBConfig.mCursorFactory = this.mInnerCursorFactory;

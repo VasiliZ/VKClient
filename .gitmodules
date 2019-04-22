@@ -1,3 +1,6 @@
-[submodule "MyImageLoader"]
-	path = MyImageLoader
-	url = https://github.com/VasiliZ/MyImageLoader
+[submodule "ImageLoader"]
+	path = ImageLoader
+	url = https://github.com/VasiliZ/MyImageLoader.git
+[submodule "ExpandableTextView"]
+	path = ExpandableTextView
+	url = https://github.com/VasiliZ/ExpandableTextView.git

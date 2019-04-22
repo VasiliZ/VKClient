@@ -5,6 +5,7 @@ import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Collections;
 import java.util.List;
 
 @Table
@@ -98,7 +99,7 @@ public class Item {
     }
 
     public List<Attachment> getAttachments() {
-        return mAttachments;
+        return Collections.unmodifiableList(mAttachments);
     }
 
     public void setAttachments(final List<Attachment> pAttachments) {

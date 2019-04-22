@@ -6,6 +6,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.ViewTreeObserver;
+import android.widget.TextView;
 
 import com.github.vasiliz.vkclient.R;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
@@ -26,11 +28,11 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
     private String mAccessKey;
     private boolean isLoading;
     public static int PAGE_START = 1;
-    private int currentPage = PAGE_START;
+    //private int currentPage = PAGE_START;
 
     @Override
     public void onRefresh() {
-        currentPage = PAGE_START;
+        //  currentPage = PAGE_START;
         isLastPage = false;
         mNewsAdapter.clear();
         mIMainPresenter.loadNews();
@@ -68,7 +70,7 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
-                currentPage++;
+                //    currentPage++;
                 mIMainPresenter.loadMoreNews();
             }
 
@@ -102,5 +104,7 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
     public SwipeRefreshLayout handleSwipe() {
         return mSwipeRefreshLayout;
     }
+
+
 
 }

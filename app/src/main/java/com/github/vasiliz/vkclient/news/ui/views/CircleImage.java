@@ -27,18 +27,18 @@ public class CircleImage extends AppCompatImageView {
     private RectF mRectF = new RectF();
     private Path mPath = new Path();
 
-    public CircleImage(Context context) {
+    public CircleImage(final Context context) {
         super(context);
         init();
     }
 
-    public CircleImage(Context context, AttributeSet attrs) {
+    public CircleImage(final Context context, final AttributeSet attrs) {
         super(context, attrs);
         getAttributes(attrs);
         init();
     }
 
-    public CircleImage(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CircleImage(final Context context, final AttributeSet attrs, final int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         getAttributes(attrs);
         init();
@@ -48,7 +48,7 @@ public class CircleImage extends AppCompatImageView {
         setBorderColor(mBorderColor);
     }
 
-    private void setBorderColor(int pBorderColor) {
+    private void setBorderColor(final int pBorderColor) {
         mBorderPaint.setColor(pBorderColor);
         mBorderPaint.setStyle(Paint.Style.STROKE);
         mBorderPaint.setAntiAlias(true);
@@ -56,9 +56,9 @@ public class CircleImage extends AppCompatImageView {
         invalidate();
     }
 
-    private void getAttributes(AttributeSet pAttributeSet) {
+    private void getAttributes(final AttributeSet pAttributeSet) {
 
-        TypedArray array = getContext().getTheme().obtainStyledAttributes(pAttributeSet, R.styleable.circle_image, 0, 0);
+        final TypedArray array = getContext().getTheme().obtainStyledAttributes(pAttributeSet, R.styleable.circle_image, 0, 0);
         try {
             mBorderColor = array.getColor(R.styleable.circle_image_border_color, getResources().getColor(R.color.colorPrimary));
             mImageResourse = array.getInteger(R.styleable.circle_image_src, R.drawable.template);
@@ -68,17 +68,17 @@ public class CircleImage extends AppCompatImageView {
     }
 
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int screenWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int screenHeight = MeasureSpec.getSize(heightMeasureSpec);
+        final int screenWidth = MeasureSpec.getSize(widthMeasureSpec);
+        final int screenHeight = MeasureSpec.getSize(heightMeasureSpec);
         mRectF.set(0, 0, screenWidth, screenHeight);
     }
 
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(final Canvas canvas) {
         mPaint.setColor(BLACK);
-        float borderWidth = 1f;
+        final float borderWidth = 1f;
         canvas.drawCircle(mRectF.centerX(), mRectF.centerY(), (mRectF.height() / 2) - borderWidth, mPaint);
         canvas.drawCircle(mRectF.centerX(), mRectF.centerY(), (mRectF.height() / 2) - borderWidth, mBorderPaint);
         mPath.addCircle(mRectF.centerX(), mRectF.centerY(), (mRectF.height() / 2), Path.Direction.CW);
