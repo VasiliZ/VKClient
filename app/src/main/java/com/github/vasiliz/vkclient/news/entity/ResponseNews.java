@@ -1,11 +1,14 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Collections;
 import java.util.List;
 
-public class ResponseNews {
+public class ResponseNews implements Parcelable {
     @SerializedName("items")
     private List<Item> mItemList;
     @SerializedName("profiles")
@@ -46,4 +49,36 @@ public class ResponseNews {
         mGroupsList = pGroupsList;
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(this.mItemList);
+        dest.writeTypedList(this.mProfileList);
+        dest.writeTypedList(this.mGroupsList);
+        dest.writeString(this.mNextNews);
+    }
+
+    protected ResponseNews(Parcel in) {
+        this.mItemList = in.createTypedArrayList(Item.CREATOR);
+        this.mProfileList = in.createTypedArrayList(Profile.CREATOR);
+        this.mGroupsList = in.createTypedArrayList(Groups.CREATOR);
+        this.mNextNews = in.readString();
+    }
+
+    public static final Creator<ResponseNews> CREATOR = new Creator<ResponseNews>() {
+        @Override
+        public ResponseNews createFromParcel(Parcel source) {
+            return new ResponseNews(source);
+        }
+
+        @Override
+        public ResponseNews[] newArray(int size) {
+            return new ResponseNews[size];
+        }
+    };
 }

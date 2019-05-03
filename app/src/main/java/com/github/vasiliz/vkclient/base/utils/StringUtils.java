@@ -18,8 +18,9 @@ public final class StringUtils {
             Log.d(TAG, "getAccessToken: " + s);
             final String[] parts = s.split("=");
             if (parts[0].equals(ConstantStrings.ApiVK.CHECK_ACCESS_TOKEN)) {
-
                 return parts[1];
+            }else {
+                return "";
             }
         }
 

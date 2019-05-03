@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardUseCompatPadding="true">
@@ -12,147 +11,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/header_item_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+        <include layout="@layout/header_news_item" />
 
-            <com.github.vasiliz.vkclient.news.ui.views.CircleImage
-                android:id="@+id/avatar_image_view"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="@dimen/dimen_16dp"/>
+        <include layout="@layout/content_item_news" />
 
-            <LinearLayout
-                android:layout_gravity="center_vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/name_group_or_profile_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/news_post_name"
-                    tools:hint="test text"/>
-
-                <TextView
-                    android:id="@+id/time_post_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp"
-                    tools:hint="test text"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <com.github.vasiliz.myapplication.ExpandableTextView
-            android:id="@+id/news_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:color_expand_text="@color/news_post_name"
-            app:line_spacing="1.25"
-            app:main_text_size="14"
-            app:text_for_expand="@string/show_more_text"
-            app:text_size_expand_text="16"
-            tools:hint="test text"
-            android:layout_marginStart="@dimen/dimen_8dp"
-            android:layout_marginEnd="@dimen/dimen_8dp"
-            android:layout_marginBottom="@dimen/dimen_8dp"/>
-       <!-- custom container-->
-       <!-- <LinearLayout
-            android:id="media_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>-->
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/image_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/video_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/audio_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/doc_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_marginTop="@dimen/dimen_8dp"
-            android:layout_marginStart="@dimen/dimen_8dp"
-            android:layout_marginBottom="@dimen/dimen_12dp"
-            android:layout_height="32dp"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:id="@+id/like_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="16dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/like_24dp"/>
-
-                <TextView
-                    android:id="@+id/like_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/comment_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginEnd="16dp"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/comment_24dp"/>
-
-                <TextView
-                    android:id="@+id/comment_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/repost_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/repost_24dp"/>
-
-                <TextView
-                    android:id="@+id/repost_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-        </LinearLayout>
+        <include layout="@layout/footer_item_news" />
     </LinearLayout>
-
-
 </android.support.v7.widget.CardView>

@@ -1,15 +1,20 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.github.vasiliz.vkclient.base.db.config.Field;
 import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Table
-public class Item {
+public class Item implements Parcelable {
 
     @Id
     private Long mLong;
@@ -99,7 +104,10 @@ public class Item {
     }
 
     public List<Attachment> getAttachments() {
-        return Collections.unmodifiableList(mAttachments);
+        if (mAttachments != null) {
+            return Collections.unmodifiableList(mAttachments);
+        }
+        return null;
     }
 
     public void setAttachments(final List<Attachment> pAttachments) {
@@ -142,4 +150,54 @@ public class Item {
     public int hashCode() {
         return super.hashCode();
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(final Parcel dest, final int flags) {
+        dest.writeValue(this.mLong);
+        dest.writeString(this.mType);
+        dest.writeInt(this.mSourseId);
+        dest.writeLong(this.mDate);
+        dest.writeInt(this.mPostId);
+        dest.writeString(this.mPostType);
+        dest.writeString(this.mText);
+        dest.writeList(this.mAttachments);
+        dest.writeParcelable(this.mComments, flags);
+        dest.writeParcelable(this.mLikes, flags);
+        dest.writeParcelable(this.mReposts, flags);
+        dest.writeParcelable(this.mViews, flags);
+    }
+
+    private Item(final Parcel in) {
+        this.mLong = (Long) in.readValue(Long.class.getClassLoader());
+        this.mType = in.readString();
+        this.mSourseId = in.readInt();
+        this.mDate = in.readLong();
+        this.mPostId = in.readInt();
+        this.mPostType = in.readString();
+        this.mText = in.readString();
+        this.mAttachments = new ArrayList<Attachment>();
+        in.readList(this.mAttachments, Attachment.class.getClassLoader());
+        this.mComments = in.readParcelable(Comments.class.getClassLoader());
+        this.mLikes = in.readParcelable(Likes.class.getClassLoader());
+        this.mReposts = in.readParcelable(Reposts.class.getClassLoader());
+        this.mViews = in.readParcelable(Views.class.getClassLoader());
+    }
+
+    public static final Creator<Item> CREATOR = new Creator<Item>() {
+        @Override
+        public Item createFromParcel(final Parcel source) {
+            return new Item(source);
+        }
+
+        @Override
+        public Item[] newArray(final int size) {
+            return new Item[size];
+        }
+    };
 }

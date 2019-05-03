@@ -6,7 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class IOUtils {
+public final class IOUtils {
 
     private IOUtils(){}
 
@@ -19,5 +19,4 @@ public class IOUtils {
             }
         }
     }
-
 }

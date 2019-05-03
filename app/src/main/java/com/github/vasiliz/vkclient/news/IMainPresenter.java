@@ -7,4 +7,9 @@ public interface IMainPresenter extends com.github.vasiliz.vkclient.news.observe
     void loadNews();
 
     void  loadMoreNews();
+
+    Response getSavingData();
+
+    void goToLogin();
+
 }

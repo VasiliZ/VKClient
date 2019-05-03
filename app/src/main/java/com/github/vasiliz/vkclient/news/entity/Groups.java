@@ -1,11 +1,17 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.github.vasiliz.vkclient.base.db.config.Field;
 import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
 @Table
-public class Groups {
+public class Groups implements Parcelable {
     @Field
     @SerializedName("id")
     private long mId;
@@ -97,4 +103,45 @@ public class Groups {
     public void setUrlGroupPhoto200(final String pUrlGroupPhoto200) {
         mUrlGroupPhoto200 = pUrlGroupPhoto200;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(final Parcel dest, final int flags) {
+        dest.writeLong(this.mId);
+        dest.writeString(this.mNameGroup);
+        dest.writeString(this.mScreenName);
+        dest.writeInt(this.mIsClosed);
+        dest.writeString(this.mType);
+        dest.writeString(this.mUrlGroupPhoto50);
+        dest.writeString(this.mUrlGroupPhoto100);
+        dest.writeString(this.mUrlGroupPhoto200);
+    }
+
+     private Groups(final Parcel in) {
+        this.mId = in.readLong();
+        this.mNameGroup = in.readString();
+        this.mScreenName = in.readString();
+        this.mIsClosed = in.readInt();
+        this.mType = in.readString();
+        this.mUrlGroupPhoto50 = in.readString();
+        this.mUrlGroupPhoto100 = in.readString();
+        this.mUrlGroupPhoto200 = in.readString();
+    }
+
+    public static final Creator<Groups> CREATOR = new Creator<Groups>() {
+        @Override
+        public Groups createFromParcel(final Parcel source) {
+            return new Groups(source);
+        }
+
+        @Override
+        public Groups[] newArray(final int size) {
+            return new Groups[size];
+        }
+    };
 }

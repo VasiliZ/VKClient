@@ -1,12 +1,14 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.github.vasiliz.vkclient.base.db.config.Field;
-import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.google.gson.annotations.SerializedName;
 
 @Table
-public class Profile {
+public class Profile implements Parcelable {
 
     @Field
     @SerializedName("id")
@@ -99,4 +101,45 @@ public class Profile {
     public void setOnline(final int pOnline) {
         mOnline = pOnline;
     }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(final Parcel dest, final int flags) {
+        dest.writeLong(this.mId);
+        dest.writeString(this.mFirstName);
+        dest.writeString(this.mLastName);
+        dest.writeString(this.mSex);
+        dest.writeString(this.mScreenName);
+        dest.writeString(this.mUrlPhoto50);
+        dest.writeString(this.mUrlPhoto100);
+        dest.writeInt(this.mOnline);
+    }
+
+    private Profile(final Parcel in) {
+        this.mId = in.readLong();
+        this.mFirstName = in.readString();
+        this.mLastName = in.readString();
+        this.mSex = in.readString();
+        this.mScreenName = in.readString();
+        this.mUrlPhoto50 = in.readString();
+        this.mUrlPhoto100 = in.readString();
+        this.mOnline = in.readInt();
+    }
+
+    public static final Creator<Profile> CREATOR = new Creator<Profile>() {
+        @Override
+        public Profile createFromParcel(final Parcel source) {
+            return new Profile(source);
+        }
+
+        @Override
+        public Profile[] newArray(final int size) {
+            return new Profile[size];
+        }
+    };
 }

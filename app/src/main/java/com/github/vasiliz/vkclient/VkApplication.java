@@ -1,6 +1,7 @@
 package com.github.vasiliz.vkclient;
 
 import android.app.Application;
+import android.os.StrictMode;
 
 import com.github.vasiliz.myimageloader.ImageLoader;
 import com.github.vasiliz.vkclient.api.LoadMoreNews;
@@ -21,13 +22,21 @@ public class VkApplication extends Application {
     private static CreateRequest mLoadMoreNews;
     private static DBHelper mDBHelper;
 
-    public static DBHelper getDBHelper() {
-        return mDBHelper;
-    }
-
     @Override
     public void onCreate() {
         super.onCreate();
+
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectDiskReads()
+                .detectDiskWrites()
+                .detectNetwork()
+                .penaltyLog()
+                .build());
+
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectLeakedSqlLiteObjects()
+                .detectLeakedClosableObjects()
+                .penaltyLog()
+                .build());
         init();
 
     }
@@ -71,6 +80,10 @@ public class VkApplication extends Application {
 
     public static ImageLoader getmImageLoader() {
         return mImageLoader;
+    }
+
+    public static DBHelper getDBHelper() {
+        return mDBHelper;
     }
 
 }

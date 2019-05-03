@@ -15,4 +15,9 @@ public interface IMainView extends VkBaseView {
     void loadMoreData(boolean pIsLoading);
 
     SwipeRefreshLayout handleSwipe();
+
+    void onLoadError();
+
+    void goToLogin();
+
 }

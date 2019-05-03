@@ -13,13 +13,13 @@ import com.github.vasiliz.vkclient.news.entity.Audio;
 
 import java.util.List;
 
-public class AttachmentAudioAdapter extends RecyclerView.Adapter<AttachmentAudioAdapter.AudioItemHolder> {
+public class SongsAdapter extends RecyclerView.Adapter<SongsAdapter.AudioItemHolder> {
 
-    private LayoutInflater mInflater;
-    private List<Audio> mAudios;
+    private final LayoutInflater mInflater;
+    private final List<Audio> mAudios;
 
-    public AttachmentAudioAdapter(final Context pContext, final List<Audio> pAudios) {
-        mAudios = pAudios;
+    SongsAdapter(final Context pContext, final List<Audio> pSongs) {
+        mAudios = pSongs;
         mInflater = LayoutInflater.from(pContext);
     }
 
@@ -34,6 +34,8 @@ public class AttachmentAudioAdapter extends RecyclerView.Adapter<AttachmentAudio
     public void onBindViewHolder(@NonNull final AudioItemHolder pAudioItemHolder, final int pI) {
         final Audio audio = mAudios.get(pI);
         pAudioItemHolder.mTextView.setText(audio.getArtist());
+        pAudioItemHolder.mNameSongTextView.setText(audio.getmNameSong());
+        pAudioItemHolder.mDurationSong.setText(String.valueOf(audio.getmSongDuration()));
     }
 
     @Override
@@ -43,11 +45,15 @@ public class AttachmentAudioAdapter extends RecyclerView.Adapter<AttachmentAudio
 
     class AudioItemHolder extends RecyclerView.ViewHolder {
 
-        private TextView mTextView;
+        private final TextView mTextView;
+        private final TextView mNameSongTextView;
+        private final TextView mDurationSong;
 
-        public AudioItemHolder(@NonNull final View itemView) {
+        AudioItemHolder(@NonNull final View itemView) {
             super(itemView);
-            mTextView = itemView.findViewById(R.id.text_audio);
+            mTextView = itemView.findViewById(R.id.title_music_text_view);
+            mNameSongTextView = itemView.findViewById(R.id.name_sound_text_view);
+            mDurationSong = itemView.findViewById(R.id.sound_duration_text_view);
         }
     }
 

@@ -14,20 +14,4 @@ public class VkPresenter<View extends VkBaseView> {
         return this.mReference.get();
     }
 
-    void onPause(){
-
-    }
-
-    void onResume(){
-        if (mReference!=null){
-            mReference.get();
-        }
-    }
-
-    void detachView(){
-        if (mReference!=null){
-            mReference=null;
-        }
-    }
-
 }

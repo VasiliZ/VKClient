@@ -47,7 +47,14 @@ public final class AppDB {
 
     private AppDB() {
         mDBHelper = VkApplication.getDBHelper();
-        mDBHelper.getWritableDatabase();
+        new Runnable(){
+
+            @Override
+            public void run() {
+                mDBHelper.getWritableDatabase();
+            }
+        };
+
     }
 
     public static synchronized AppDB getAppDBInstance() {

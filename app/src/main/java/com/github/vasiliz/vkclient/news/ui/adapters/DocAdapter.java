@@ -15,12 +15,12 @@ import com.github.vasiliz.vkclient.news.entity.Doc;
 
 import java.util.List;
 
-public class AttachmentDocAdapter extends RecyclerView.Adapter<AttachmentDocAdapter.DocItemHolder> {
+public class DocAdapter extends RecyclerView.Adapter<DocAdapter.DocItemHolder> {
 
-    private LayoutInflater mLayoutInflater;
-    private List<Doc> mDocs;
+    private final LayoutInflater mLayoutInflater;
+    private final List<Doc> mDocs;
 
-    public AttachmentDocAdapter(final Context pContext, final List<Doc> pDocList) {
+    DocAdapter(final Context pContext, final List<Doc> pDocList) {
         mLayoutInflater = LayoutInflater.from(pContext);
         mDocs = pDocList;
     }
@@ -35,12 +35,18 @@ public class AttachmentDocAdapter extends RecyclerView.Adapter<AttachmentDocAdap
     @Override
     public void onBindViewHolder(@NonNull final DocItemHolder pDocItemHolder, final int pI) {
         final Doc doc = mDocs.get(pI);
-        pDocItemHolder.mTextView.setText(doc.getTitle());
+        pDocItemHolder.mTitleDoc.setText(doc.getTitle());
         if (doc.getPreview() != null) {
             ImageLoader.getInstance()
                     .with(mLayoutInflater.getContext())
-                    .load(doc.getPreview().getPhotoDocPreview().getSizesPhotoPreviews().get(2).getSourse())
-                    .into(pDocItemHolder.mImageView);
+                    .load(doc.getPreview()
+                            .getPhotoPreview()
+                            .getSizesPhotoPreviews()
+                            .get(2)
+                            .getSourse())
+                    .into(pDocItemHolder.mImagePreview);
+
+            pDocItemHolder.mDocExt.setText(doc.getExt());
         }
     }
 
@@ -51,14 +57,16 @@ public class AttachmentDocAdapter extends RecyclerView.Adapter<AttachmentDocAdap
 
     class DocItemHolder extends RecyclerView.ViewHolder {
 
-        private TextView mTextView;
-        private ImageView mImageView;
+        private final TextView mTitleDoc;
+        private final TextView mDocExt;
+        private final ImageView mImagePreview;
 
-        public DocItemHolder(@NonNull final View itemView) {
+        DocItemHolder(@NonNull final View itemView) {
             super(itemView);
 
-            mTextView = itemView.findViewById(R.id.doc_title);
-            mImageView = itemView.findViewById(R.id.doc_preview_image);
+            mTitleDoc = itemView.findViewById(R.id.doc_title_text);
+            mDocExt = itemView.findViewById(R.id.doc_ext);
+            mImagePreview = itemView.findViewById(R.id.image_doc_preview);
         }
     }
 

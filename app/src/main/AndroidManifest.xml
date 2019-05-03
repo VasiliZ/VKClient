@@ -15,7 +15,7 @@
         android:theme="@style/noActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".login.LoginActivity"
+            android:name=".login.ui.LoginActivity"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -24,6 +24,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".news.ui.VkMainActivity"/>
+        <activity android:name=".news.newsItem.NewsItemActivity"/>
     </application>
 
 </manifest>

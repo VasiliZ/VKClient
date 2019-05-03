@@ -3,6 +3,8 @@ package com.github.vasiliz.vkclient.base.services;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.github.vasiliz.vkclient.news.entity.Response;
+
 public abstract class IAbstractTask<T>
         implements
         ITask<T>,
@@ -82,5 +84,4 @@ public abstract class IAbstractTask<T>
         };
         handler.post(runnable);
     }
-
 }

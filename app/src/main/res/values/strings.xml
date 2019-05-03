@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">VKClient</string>
+    <string name="other_doc_image">other doc image</string>
+    <string name="doc">Документ</string>
+    <string name="error_load">Не удалось загрузить новости</string>
+    <string name="like_image">like</string>
+    <string name="comment_image">comment</string>
+    <string name="repost_image">repost</string>
 </resources>
