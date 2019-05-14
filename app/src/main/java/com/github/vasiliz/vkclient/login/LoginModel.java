@@ -1,6 +1,5 @@
 package com.github.vasiliz.vkclient.login;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
@@ -22,15 +21,16 @@ public class LoginModel {
         if (!"".equals(token)) {
             editor.putString(ConstantStrings.ApiVK.TOKEN_NAME, token);
             editor.apply();
+            editor.commit();
             mLoginPresenter.checkLogin();
         } else {
             mLoginPresenter.reAuth();
         }
     }
 
-    public boolean checkLogin() {
+    boolean checkLogin() {
         final String token = mSharedPreferences.getString(ConstantStrings.ApiVK.TOKEN_NAME, "");
-        return !token.equals("");
+        return !token.isEmpty();
     }
 
     String getToken() {
@@ -42,5 +42,6 @@ public class LoginModel {
         final SharedPreferences.Editor editor = mSharedPreferences.edit();
         editor.remove(ConstantStrings.ApiVK.TOKEN_NAME);
         editor.apply();
+        editor.commit();
     }
 }

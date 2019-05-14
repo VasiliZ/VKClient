@@ -2,55 +2,85 @@ package com.github.vasiliz.vkclient.base.db.config;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.github.vasiliz.vkclient.VkApplication;
+import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.github.vasiliz.vkclient.base.utils.CursorUtils;
-import com.github.vasiliz.vkclient.base.utils.StringUtils;
 import com.github.vasiliz.vkclient.news.entity.Attachment;
+import com.github.vasiliz.vkclient.news.entity.Audio;
 import com.github.vasiliz.vkclient.news.entity.Comments;
+import com.github.vasiliz.vkclient.news.entity.Doc;
 import com.github.vasiliz.vkclient.news.entity.Groups;
 import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Likes;
+import com.github.vasiliz.vkclient.news.entity.Link;
+import com.github.vasiliz.vkclient.news.entity.Photo;
+import com.github.vasiliz.vkclient.news.entity.PhotoPreview;
+import com.github.vasiliz.vkclient.news.entity.Preview;
 import com.github.vasiliz.vkclient.news.entity.Profile;
 import com.github.vasiliz.vkclient.news.entity.Reposts;
 import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.entity.ResponseNews;
+import com.github.vasiliz.vkclient.news.entity.SizesPhotoPreview;
+import com.github.vasiliz.vkclient.news.entity.Video;
+import com.github.vasiliz.vkclient.news.entity.VideoDocPreview;
 import com.github.vasiliz.vkclient.news.entity.Views;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Database(databaseName = "mydbVk",
-        entity = {Profile.class,
+        entity = {
+                Profile.class,
                 Item.class,
-                Groups.class})
+                Groups.class,
+                Attachment.class,
+                Likes.class,
+                Reposts.class,
+                Comments.class,
+                Views.class,
+                Audio.class,
+                Video.class,
+                Photo.class,
+                Link.class,
+                Doc.class,
+                Preview.class,
+                PhotoPreview.class,
+                VideoDocPreview.class,
+                SizesPhotoPreview.class})
 public final class AppDB {
 
+    private static AppDB INSTANCE;
     private final DBHelper mDBHelper;
     private final String TAG = AppDB.class.getSimpleName();
-    private static final String COMMA = ",";
-    private static final String QUOTE = "\"";
-    private static final String SINGLE_QUOTE = "\'";
-    private static final String SEMICOLON = ";";
-    private static final String OPEN_BRACKET = "(";
-    private static final String CLOSE_BRACKET = ")";
-    private static final String INSERT = "Insert into ";
-    private static final String VALUES = " VALUES ";
-    private static final String SELECT_FROM = "Select * from ";
-    private static final String LIMIT = " LIMIT ";
-    private static AppDB INSTANCE;
+    private final String SELECT_FROM = "Select * from ";
+    private final String LIMIT = " LIMIT ";
+    private final String SELECT_DISTINCT = "Select distinct ";
+    private final String DOT = ".";
+    private final String COMMA = ", ";
+    private final String SPACE = " ";
+    private final String FROM = " from ";
+    private final String INNER_JOIN = " inner join ";
+    private final String ON = " on ";
+    private final String OPEN_BRACKET = "(";
+    private final String CLOSE_BRACKET = ")";
+    private final String EQUALLY = " = ";
+    private final String ORDER_BY = " order by ";
+    private final String DESC = " desc";
+    private final String END_QUERY = " ;";
+    private final String LEFT_JOIN = " left join ";
+    private final String PHOTO = " photo";
+    private String WHERE = " Where ";
+    private int mItemslinit = 0;
 
     private AppDB() {
         mDBHelper = VkApplication.getDBHelper();
-        new Runnable(){
+        new Runnable() {
 
             @Override
-            public void run() {
+            public synchronized void run() {
                 mDBHelper.getWritableDatabase();
             }
         };
@@ -71,123 +101,245 @@ public final class AppDB {
             final List<Groups> groups = pResponse.getResponseNews().getGroupsList();
             final List<Profile> profiles = pResponse.getResponseNews().getProfileList();
             final List<Item> items = pResponse.getResponseNews().getItemList();
-            final String groupTable = headOfQuery(Groups.class) + dataOfQueryGroups(groups);
-            final String fillProfileTable = headOfQuery(Profile.class) + dataOfQueryProfiles(profiles);
-            final String fillItems = headOfQuery(Item.class) + dataOfQueryItems(items);
-            database.execSQL(groupTable);
-            database.execSQL(fillProfileTable);
-            database.execSQL(fillItems);
+            insertGroups(groups, database);
+            insertProfiles(profiles, database);
+            insertItems(items, database);
             database.setTransactionSuccessful();
         } catch (final Exception e) {
             e.fillInStackTrace();
             //   Log.d(TAG, "Error while trying read data to db");
         } finally {
             database.endTransaction();
+            database.close();
         }
 
     }
 
-    private String headOfQuery(final Class pAnyClass) {
+    private void insertGroups(final List<Groups> pGroups, final SQLiteDatabase pSQLiteDatabase) {
+        try {
+            for (int i = 0; i < pGroups.size(); i++) {
 
-        final StringBuilder stringBuilder = new StringBuilder();
-        final Field[] fields = pAnyClass.getDeclaredFields();
-        final List<String> nameFields = new ArrayList<String>();
-        stringBuilder.append(INSERT)
-                .append(pAnyClass.getSimpleName())
-                .append(OPEN_BRACKET);
-        for (final Field field : fields) {
-            if (field.isAnnotationPresent(com.github.vasiliz.vkclient.base.db.config.Field.class)) {
-                nameFields.add(field.getName());
+                final Groups group = pGroups.get(i);
+                pSQLiteDatabase
+                        .insertWithOnConflict(
+                                Groups.class.getSimpleName(),
+                                null,
+                                group.getContentValues(),
+                                SQLiteDatabase.CONFLICT_REPLACE);
             }
-        }
-        Collections.sort(nameFields);
-
-        for (final String name : nameFields) {
-            stringBuilder.append(name)
-                    .append(COMMA);
+        } catch (final Exception pE) {
+            pE.fillInStackTrace();
         }
 
-        stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
-        stringBuilder.append(CLOSE_BRACKET + VALUES);
-        return stringBuilder.toString();
     }
 
-    private String dataOfQueryGroups(final List<Groups> pGroups) {
-        final StringBuilder groupsValueBuilder = new StringBuilder();
-        for (int i = 0; i < pGroups.size(); i++) {
-            groupsValueBuilder
-                    .append(OPEN_BRACKET).append(pGroups.get(i).getId()).append(COMMA)
-                    .append(pGroups.get(i).getIsClosed()).append(COMMA)
-                    .append(QUOTE).append(StringUtils.replace(pGroups.get(i).getNameGroup())).append(QUOTE).append(COMMA)
-                    .append(QUOTE).append(pGroups.get(i).getScreenName()).append(QUOTE).append(COMMA)
-                    .append(QUOTE).append(pGroups.get(i).getType()).append(QUOTE).append(COMMA)
-                    .append(QUOTE).append(pGroups.get(i).getUrlGroupPhoto100()).append(QUOTE).append(COMMA)
-                    .append(QUOTE).append(pGroups.get(i).getUrlGroupPhoto200()).append(QUOTE).append(COMMA)
-                    .append(QUOTE).append(pGroups.get(i).getUrlGroupPhoto50()).append(QUOTE).append(COMMA);
-            groupsValueBuilder.delete(groupsValueBuilder.length() - 1, groupsValueBuilder.length());
-            groupsValueBuilder
-                    .append(CLOSE_BRACKET)
-                    .append(COMMA);
-        }
-        groupsValueBuilder.delete(groupsValueBuilder.length() - 1, groupsValueBuilder.length());
-        groupsValueBuilder.append(SEMICOLON);
-        return groupsValueBuilder.toString();
-    }
-
-    private String dataOfQueryProfiles(final List<Profile> pProfiles) {
-        final StringBuilder profileValueBuilder = new StringBuilder();
+    private void insertProfiles(final List<Profile> pProfiles, final SQLiteDatabase pSQLiteDatabase) {
         for (int i = 0; i < pProfiles.size(); i++) {
-            profileValueBuilder.append(OPEN_BRACKET)
-                    .append(SINGLE_QUOTE).append(pProfiles.get(i).getFirstName()).append(SINGLE_QUOTE).append(COMMA)
-                    .append(pProfiles.get(i).getId()).append(COMMA)
-                    .append(QUOTE).append(pProfiles.get(i).getLastName()).append(QUOTE).append(COMMA)
-                    .append(pProfiles.get(i).getOnline()).append(COMMA)
-                    .append(QUOTE).append(pProfiles.get(i).getScreenName()).append(QUOTE).append(COMMA)
-                    .append(QUOTE).append(pProfiles.get(i).getSex()).append(QUOTE).append(COMMA)
-                    .append(QUOTE).append(pProfiles.get(i).getUrlPhoto100()).append(QUOTE).append(COMMA)
-                    .append(QUOTE).append(pProfiles.get(i).getUrlPhoto50()).append(QUOTE).append(COMMA);
-            profileValueBuilder.delete(profileValueBuilder.length() - 1, profileValueBuilder.length());
-            profileValueBuilder
-                    .append(CLOSE_BRACKET)
-                    .append(COMMA);
+            final Profile profile = pProfiles.get(i);
+            pSQLiteDatabase
+                    .insertWithOnConflict(
+                            Profile.class.getSimpleName(),
+                            null,
+                            profile.getContentValues(),
+                            SQLiteDatabase.CONFLICT_REPLACE);
 
         }
-        profileValueBuilder.delete(profileValueBuilder.length() - 1, profileValueBuilder.length());
-        profileValueBuilder.append(SEMICOLON);
-        return profileValueBuilder.toString();
     }
 
-    private String dataOfQueryItems(final List<Item> pItems) {
-        final StringBuilder buildQueryForItem = new StringBuilder();
+    private void insertItems(final List<Item> pItems, final SQLiteDatabase pSQLiteDatabase) {
         for (int i = 0; i < pItems.size(); i++) {
-            buildQueryForItem
-                    .append(OPEN_BRACKET)
-                    .append(SINGLE_QUOTE).append(objectToJson(pItems.get(i).getAttachments())).append(SINGLE_QUOTE).append(COMMA)
-                    .append(SINGLE_QUOTE).append(objectToJson(pItems.get(i).getComments())).append(SINGLE_QUOTE).append(COMMA)
-                    .append(pItems.get(i).getDate()).append(COMMA)
-                    .append(SINGLE_QUOTE).append(objectToJson(pItems.get(i).getLikes())).append(SINGLE_QUOTE).append(COMMA)
-                    .append(pItems.get(i).getPostId()).append(COMMA)
-                    .append(SINGLE_QUOTE).append(pItems.get(i).getPostType()).append(SINGLE_QUOTE).append(COMMA)
-                    .append(SINGLE_QUOTE).append(objectToJson(pItems.get(i).getReposts())).append(SINGLE_QUOTE).append(COMMA)
-                    .append(pItems.get(i).getSourseId()).append(COMMA)
-                    .append(SINGLE_QUOTE).append(pItems.get(i).getText()).append(SINGLE_QUOTE).append(COMMA)
-                    .append(SINGLE_QUOTE).append(pItems.get(i).getType()).append(SINGLE_QUOTE).append(COMMA)
-                    .append(SINGLE_QUOTE).append(objectToJson(pItems.get(i).getViews())).append(SINGLE_QUOTE).append(COMMA);
-            buildQueryForItem.delete(buildQueryForItem.length() - 1, buildQueryForItem.length());
-            buildQueryForItem
-                    .append(CLOSE_BRACKET)
-                    .append(COMMA);
-        }
+            final Item item = pItems.get(i);
+            pSQLiteDatabase
+                    .insertWithOnConflict(
+                            Item.class.getSimpleName(),
+                            null,
+                            item.getContentValues(),
+                            SQLiteDatabase.CONFLICT_REPLACE);
 
-        buildQueryForItem.delete(buildQueryForItem.length() - 1, buildQueryForItem.length());
-        buildQueryForItem.append(SEMICOLON);
-        return buildQueryForItem.toString();
+            insertAttachment(item, pSQLiteDatabase);
+            insertLike(item, pSQLiteDatabase);
+            insertComments(item, pSQLiteDatabase);
+            insertReposts(item, pSQLiteDatabase);
+            insertViews(item, pSQLiteDatabase);
+        }
     }
 
-    private String objectToJson(final Object pClass) {
-        final Gson gson = new GsonBuilder().create();
-        return gson.toJson(pClass);
+    private void insertViews(final Item pItem, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(
+                        Views.class.getSimpleName(),
+                        null,
+                        pItem.getViews()
+                                .getContentValues(pItem.getPostId()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+    }
 
+    private void insertReposts(final Item pItem, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(
+                        Reposts.class.getSimpleName(),
+                        null,
+                        pItem.getReposts()
+                                .getContentValues(pItem.getPostId()), SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    private void insertComments(final Item pItem, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(
+                        Comments.class.getSimpleName(),
+                        null,
+                        pItem.getComments()
+                                .getContentValue(pItem.getPostId()), SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    private void insertLike(final Item pItem, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(
+                        Likes.class.getSimpleName(),
+                        null,
+                        pItem.getLikes()
+                                .getContentValues(pItem.getPostId()), SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    private void insertAttachment(final Item pItem, final SQLiteDatabase pSQLiteDatabase) {
+        try {
+            if (pItem.getAttachments() != null) {
+                for (int i = 0; i < pItem.getAttachments().size(); i++) {
+                    final Attachment attachment = pItem.getAttachments().get(i);
+                    pSQLiteDatabase
+                            .insertWithOnConflict(
+                                    Attachment.class.getSimpleName(),
+                                    null,
+                                    attachment.getContentValues(pItem.getPostId()),
+                                    SQLiteDatabase.CONFLICT_REPLACE);
+                    if (attachment.getAudio() != null) {
+                        insertAudio(attachment, pSQLiteDatabase);
+                    } else if (attachment.getVideo() != null) {
+                        insertVideo(attachment, pSQLiteDatabase);
+                    } else if (attachment.getPhoto() != null) {
+                        insertPhoto(attachment, pSQLiteDatabase);
+                    } else if (attachment.getLink() != null) {
+                        insertLink(attachment, pSQLiteDatabase);
+                    } else {
+                        insertDoc(attachment, pSQLiteDatabase);
+                    }
+                }
+            }
+        } catch (final Exception pE) {
+            pE.fillInStackTrace();
+        }
+    }
+
+    private void insertDoc(final Attachment pAttachment, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(Doc.class.getSimpleName(),
+                        null,
+                        pAttachment
+                                .getDoc()
+                                .getContentValues(pAttachment
+                                        .hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+        insertPreview(pAttachment.getDoc(), pSQLiteDatabase);
+    }
+
+    private void insertPreview(final Doc pDoc, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(Preview.class.getSimpleName(),
+                        null,
+                        pDoc.getPreview()
+                                .getContentValues(pDoc.hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+        insertPhotoPreview(pDoc.getPreview(), pSQLiteDatabase);
+        insertVideoPreview(pDoc.getPreview(), pSQLiteDatabase);
+    }
+
+    private void insertVideoPreview(final Preview pPreview, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(VideoDocPreview.class.getSimpleName(),
+                        null,
+                        pPreview.getVideoDocPreview()
+                                .getContentValues(pPreview.hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    private void insertPhotoPreview(final Preview pPreview, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(PhotoPreview.class.getSimpleName(),
+                        null,
+                        pPreview.getPhotoPreview()
+                                .getContentValues(pPreview
+                                        .hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+
+        insertSizesPhotoPreview(pPreview.getPhotoPreview(), pSQLiteDatabase);
+    }
+
+    private void insertSizesPhotoPreview(final PhotoPreview pPhotoPreview, final SQLiteDatabase pSQLiteDatabase) {
+        for (int i = 0; i < pPhotoPreview.getSizesPhotoPreviews().size(); i++) {
+            pSQLiteDatabase
+                    .insertWithOnConflict(SizesPhotoPreview.class.getSimpleName(),
+                            null,
+                            pPhotoPreview.getSizesPhotoPreviews()
+                                    .get(i)
+                                    .getContentValues(pPhotoPreview.hashCode()),
+                            SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+
+    private void insertLink(final Attachment pAttachment, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(Link.class.getSimpleName(),
+                        null,
+                        pAttachment.getLink()
+                                .getContentValues(pAttachment
+                                        .hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+        if (pAttachment.getLink().getPhoto() != null) {
+            insertLinkPhoto(pAttachment.getLink(), pSQLiteDatabase);
+        }
+    }
+
+    private void insertLinkPhoto(final Link pLink, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(Photo.class.getSimpleName(),
+                        null,
+                        pLink.getPhoto()
+                                .getContentValues(pLink
+                                        .hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    private void insertPhoto(final Attachment pAttachment, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(Photo.class.getSimpleName(),
+                        null,
+                        pAttachment
+                                .getPhoto()
+                                .getContentValues(pAttachment
+                                        .hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    private void insertVideo(final Attachment pAttachment, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(Video.class.getSimpleName(),
+                        null,
+                        pAttachment
+                                .getVideo()
+                                .getContentValues(pAttachment
+                                        .hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+    }
+
+    private void insertAudio(final Attachment pAttachment, final SQLiteDatabase pSQLiteDatabase) {
+        pSQLiteDatabase
+                .insertWithOnConflict(Audio.class.getSimpleName(),
+                        null,
+                        pAttachment
+                                .getAudio()
+                                .getContentValues(pAttachment
+                                        .hashCode()),
+                        SQLiteDatabase.CONFLICT_REPLACE);
     }
 
     public Response getSaveData() {
@@ -197,7 +349,6 @@ public final class AppDB {
         responseNews.setProfileList(getAllProfiles());
         responseNews.setItemList(getAllItems());
         response.setResponseNews(responseNews);
-
         return response;
     }
 
@@ -265,39 +416,253 @@ public final class AppDB {
     }
 
     private List<Item> getAllItems() {
-        final Cursor cursor = getCursorForSelectAllData(Item.class, 50);
+        Cursor cursor = null;
+        final SQLiteDatabase readable = mDBHelper.getReadableDatabase();
         final List<Item> items = new ArrayList<Item>();
         try {
+            final String sql = SELECT_DISTINCT + SPACE + Item.class.getSimpleName() +
+                    DOT + ConstantStrings.DB.ItemTable.ADDED_AT +
+                    this.COMMA + ConstantStrings.DB.ItemTable.ATTACHMENTS +
+                    this.COMMA + ConstantStrings.DB.ItemTable.COMMENTS +
+                    this.COMMA + ConstantStrings.DB.ItemTable.SOURCE_ID +
+                    this.COMMA + ConstantStrings.DB.ItemTable.DATE +
+                    this.COMMA + ConstantStrings.DB.ItemTable.LIKES +
+                    this.COMMA + ConstantStrings.DB.ItemTable.POST_ID +
+                    this.COMMA + ConstantStrings.DB.ItemTable.POST_TYPE +
+                    this.COMMA + ConstantStrings.DB.ItemTable.REPOSTS +
+                    this.COMMA + ConstantStrings.DB.ItemTable.TEXT +
+                    this.COMMA + ConstantStrings.DB.ItemTable.TYPE +
+                    this.COMMA + ConstantStrings.DB.ItemTable.VIEWS + this.COMMA +
+                    Comments.class.getSimpleName() +
+                    DOT + ConstantStrings.DB.CommnetTable.CAN_POST + SPACE +
+                    this.COMMA + ConstantStrings.DB.CommnetTable.COUNT_COMMENTS + this.COMMA +
+                    Likes.class.getSimpleName() +
+                    DOT + ConstantStrings.DB.LikesTable.CAN_LIKE + SPACE +
+                    this.COMMA + ConstantStrings.DB.LikesTable.COUNT_LIKE + SPACE +
+                    this.COMMA + ConstantStrings.DB.LikesTable.USER_LIKE + this.COMMA +
+                    Reposts.class.getSimpleName() +
+                    DOT + ConstantStrings.DB.RepostsTable.COUNT_REPOST + SPACE +
+                    this.COMMA + ConstantStrings.DB.RepostsTable.USER_REPOST + this.COMMA +
+                    Views.class.getSimpleName() +
+                    DOT + ConstantStrings.DB.ViewsTable.COUNT +
+                    FROM + Item.class.getSimpleName() + INNER_JOIN +
+                    Comments.class.getSimpleName() + ON + OPEN_BRACKET +
+                    Comments.class.getSimpleName() + DOT + ConstantStrings.DB.CommnetTable.COMMENTS_ID + EQUALLY
+                    + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
+                    + INNER_JOIN +
+                    Likes.class.getSimpleName() + ON + OPEN_BRACKET +
+                    Likes.class.getSimpleName() + DOT + ConstantStrings.DB.LikesTable.ID_LIKE + EQUALLY
+                    + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
+                    + INNER_JOIN +
+                    Reposts.class.getSimpleName() + ON + OPEN_BRACKET +
+                    Reposts.class.getSimpleName() + DOT + ConstantStrings.DB.RepostsTable.ID + EQUALLY
+                    + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
+                    + INNER_JOIN +
+                    Views.class.getSimpleName() + ON + OPEN_BRACKET +
+                    Views.class.getSimpleName() + DOT + ConstantStrings.DB.ViewsTable.ID + EQUALLY
+                    + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
+                    + ORDER_BY + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.ADDED_AT
+                    + DESC + " limit " + mItemslinit + " , 50" + END_QUERY;
+            cursor = readable.rawQuery(sql, null);
+
+            items.addAll(readDataFromCursor(cursor));
+
+        } finally {
+
+            CursorUtils.closeCursor(cursor);
+            readable.close();
+        }
+        if (items.isEmpty()) {
+            return null;
+        }
+        mItemslinit += 51;
+        return items;
+    }
+
+    private List<Item> readDataFromCursor(final Cursor pCursor) {
+        final List<Item> items = new ArrayList<Item>();
+        Item item;
+        if (pCursor.moveToFirst()) {
+            do {
+
+                item = new Item(pCursor.getString(7),//type
+                        pCursor.getInt(3),//source_id
+                        pCursor.getLong(4),//date
+                        pCursor.getInt(6),//post id
+                        pCursor.getString(7),//post type
+                        pCursor.getString(9),//text
+                        //attachments
+                        getAttachments(pCursor.getInt(6)),
+                        //comments
+                        new Comments(pCursor.getLong(13),
+                                pCursor.getInt(12)),
+                        //setLikes
+                        new Likes(pCursor.getInt(15),
+                                pCursor.getInt(16),
+                                pCursor.getInt(14)),
+                        //setReposts
+                        new Reposts(pCursor.getLong(17),
+                                pCursor.getInt(18)),
+                        //setViews
+                        new Views(pCursor.getLong(19)),
+                        pCursor.getLong(0)//addedAt
+                );
+                items.add(item);
+            } while (pCursor.moveToNext());
+        } else {
+            return null;
+        }
+        return items;
+    }
+
+    private List<Attachment> getAttachments(final int pIdAttachments) {
+        final List<Attachment> listAttachment = new ArrayList<Attachment>();
+        final SQLiteDatabase sqLiteDatabase = mDBHelper.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+
+            Log.d(TAG, "getAttachments: " + String.format(ConstantStrings.DB.Queryes.SELECT_ATTACHMENTS, pIdAttachments));
+            cursor = sqLiteDatabase
+                    .rawQuery(String
+                                    .format(Locale.ENGLISH,
+                                            ConstantStrings.DB.Queryes.SELECT_ATTACHMENTS,
+                                            pIdAttachments),
+                            null);
+            Attachment attachment;
             if (cursor.moveToFirst()) {
                 do {
-                    final Item item = new Item();
-                    //noinspection unchecked
-                    item.setAttachments((List<Attachment>) getGson()
-                            .fromJson(cursor.getString(1),
-                                    new TypeToken<ArrayList<Attachment>>() {
-
-                                    }.getType()));
-                    item.setComments(getGson().fromJson(cursor.getString(2), Comments.class));
-                    item.setDate(cursor.getInt(3));
-                    item.setLikes(getGson().fromJson(cursor.getString(4), Likes.class));
-                    item.setPostId(cursor.getInt(5));
-                    item.setPostType(cursor.getString(6));
-                    item.setReposts(getGson().fromJson(cursor.getString(7), Reposts.class));
-                    item.setSourseId(cursor.getInt(8));
-                    item.setText(cursor.getString(9));
-                    item.setType(cursor.getString(10));
-                    item.setViews(getGson().fromJson(cursor.getString(11), Views.class));
-                    items.add(item);
+                    attachment = new Attachment(
+                            cursor.getString(0),
+                            setDbDataPhoto(cursor),
+                            setDbDataAudio(cursor),
+                            setDbDataVideo(cursor),
+                            setDbDataDoc(cursor),
+                            setDbDataLink(cursor));
+                    listAttachment.add(attachment);
                 } while (cursor.moveToNext());
+            } else {
+                return null;
             }
-            Collections.reverse(items);
-            return items;
+        } catch (final Exception pE) {
+            pE.fillInStackTrace();
         } finally {
             CursorUtils.closeCursor(cursor);
         }
+
+
+        return listAttachment;
     }
 
-    private Gson getGson() {
-        return new GsonBuilder().create();
+    private Link setDbDataLink(final Cursor pCursor) {
+        final Link link = new Link(
+                pCursor.getString(28),
+                pCursor.getString(26),
+                pCursor.getString(25),
+                getPhotoLink(pCursor.getLong(27)),
+                pCursor.getString(24));
+        if (link.getLinkTitle() == null) {
+            return null;
+        }
+        return link;
+
     }
+
+    private Photo getPhotoLink(final long pLong) {
+
+        final SQLiteDatabase sqLiteDatabase = mDBHelper.getReadableDatabase();
+        final String sql = "select Photo.* from Photo, Link " +
+                " where " + pLong + EQUALLY + "Photo.idPhoto;";
+        final Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
+        Photo photo = null;
+        Log.d(TAG, "getPhotoLink: " + sql);
+
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    photo = new Photo(
+                            cursor.getString(5),
+                            cursor.getString(6),
+                            cursor.getString(3),
+                            cursor.getString(4),
+                            cursor.getLong(0),
+                            cursor.getLong(9),
+                            cursor.getInt(10),
+                            cursor.getInt(2),
+                            cursor.getString(8),
+                            cursor.getInt(7),
+                            cursor.getString(1));
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            CursorUtils.closeCursor(cursor);
+        }
+
+
+        return photo;
+    }
+
+    private Doc setDbDataDoc(final Cursor pCursor) {
+        final Doc doc = new Doc(
+                pCursor.getString(22),
+                pCursor.getString(23),
+                pCursor.getString(19),
+                pCursor.getInt(21),
+                getDbDataPreview(pCursor.getLong(20)));
+        if (doc.getUrl() == null) {
+            return null;
+        }
+        return doc;
+    }
+
+    private Preview getDbDataPreview(final long idDataPreview) {
+        return null;
+    }
+
+    private Video setDbDataVideo(final Cursor pCursor) {
+        final Video video = new Video(
+                pCursor.getString(17),
+                pCursor.getString(16),
+                pCursor.getString(18),
+                pCursor.getInt(15));
+
+        if (video.getSource() == null) {
+            return null;
+        }
+        return video;
+    }
+
+    private Audio setDbDataAudio(final Cursor pCursor) {
+        final Audio audio = new Audio(
+                pCursor.getString(11),
+                pCursor.getString(12),
+                pCursor.getInt(13),
+                pCursor.getString(14));
+
+        if (audio.getArtist() == null) {
+            return null;
+        }
+        return audio;
+    }
+
+    private Photo setDbDataPhoto(final Cursor pCursor) {
+        final Photo photo = new Photo(
+                pCursor.getString(6),
+                pCursor.getString(7),
+                pCursor.getString(4),
+                pCursor.getString(5),
+                pCursor.getLong(1),
+                pCursor.getLong(10),
+                pCursor.getInt(11),
+                pCursor.getInt(3),
+                pCursor.getString(9),
+                pCursor.getInt(8),
+                pCursor.getString(2));
+        if (photo.getId() == 0) {
+            return null;
+        }
+        return photo;
+    }
+
 }

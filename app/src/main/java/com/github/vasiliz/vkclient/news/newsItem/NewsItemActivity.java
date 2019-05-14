@@ -12,6 +12,7 @@ import com.github.vasiliz.myapplication.ExpandableTextView;
 import com.github.vasiliz.myimageloader.ImageLoader;
 import com.github.vasiliz.vkclient.R;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
+import com.github.vasiliz.vkclient.base.utils.SetImageUtils;
 import com.github.vasiliz.vkclient.base.utils.StringUtils;
 import com.github.vasiliz.vkclient.base.utils.ViewUtils;
 import com.github.vasiliz.vkclient.mymvp.VkActivity;
@@ -45,6 +46,7 @@ public class NewsItemActivity extends VkActivity {
     private RecyclerView mAttachmentsContainer;
     private List<Groups> mGroups;
     private List<Profile> mProfiles;
+    private Item mItem;
 
 
     private String TAG = NewsItemActivity.class.getSimpleName();
@@ -62,8 +64,12 @@ public class NewsItemActivity extends VkActivity {
         final Bundle bundle = intent.getExtras();
         mGroups = bundle.getParcelableArrayList("groups");
         mProfiles = bundle.getParcelableArrayList("profiles");
-        final Item item = bundle.getParcelable("item");
+        mItem = bundle.getParcelable("item");
+        init();
+        setDataOnView();
+    }
 
+    private void init() {
         mCircleView = findViewById(R.id.avatar_image_view);
         mTextNews = findViewById(R.id.news_text_view);
         mName = findViewById(R.id.name_group_or_profile_text_view);
@@ -74,57 +80,60 @@ public class NewsItemActivity extends VkActivity {
         mCommentContainer = findViewById(R.id.comment_container);
         mAttachmentsContainer = findViewById(R.id.attachments_container);
 
+    }
 
-        final Groups group = getGroup(item);
-        final Profile profile = getProfile(item);
+    private void setDataOnView() {
+        final Groups group = getGroup(mItem);
+        final Profile profile = getProfile(mItem);
 
-        if (mGroups != null) {
+        if (group != null) {
             ImageLoader.getInstance()
                     .with(this)
-                    .load(group.getUrlGroupPhoto100())
+                    .load(SetImageUtils.chechAvatarGroup(group))
                     .into(mCircleView);
             mName.setText(group.getNameGroup());
         } else if (profile != null) {
 
             ImageLoader.getInstance()
                     .with(this)
-                    .load(profile.getUrlPhoto100())
+                    .load(SetImageUtils.checkAvatarProfile(profile))
                     .into(mCircleView);
             mName.setText(String
                     .format(profile.getFirstName() + "%s" + profile.getLastName(), " "));
         }
-        if (item.getText().isEmpty()) {
+        if (mItem.getText().isEmpty()) {
             ViewUtils.setVisibilityGone(mTextNews);
         } else {
             ViewUtils.setVisible(mTextNews);
-            mTextNews.setContent(item.getText());
+            mTextNews.setContent(mItem.getText());
         }
 
-        mDate.setText(StringUtils.getDateFromLong(item.getDate()));
+        mDate.setText(StringUtils.getDateFromLong(mItem.getDate()));
 
-        mRepostText.setText(String.valueOf(item.getReposts().getCountReposts()));
+        mRepostText.setText(String.valueOf(mItem.getReposts().getCountReposts()));
         //footer item
-        mLikeText.setText(String.valueOf(item.getLikes().getCountLike()));
+        mLikeText.setText(String.valueOf(mItem.getLikes().getCountLike()));
         //attachments content
-        if (item.getAttachments() != null) {
+        if (mItem.getAttachments() != null) {
             ViewUtils.setVisible(mAttachmentsContainer);
             final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
             linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             final AttachmentAdapter attachmentAdapter = new AttachmentAdapter(this);
-            attachmentAdapter.setData(getAggregateData(item.getAttachments()));
+            attachmentAdapter.setData(getAggregateData(mItem.getAttachments()));
             mAttachmentsContainer.setLayoutManager(linearLayoutManager);
             mAttachmentsContainer.setAdapter(attachmentAdapter);
         } else {
             ViewUtils.setVisibilityGone(mAttachmentsContainer);
         }
 
-        if (item.getComments().getCanPost() == 1) {
+        if (mItem.getComments().getCanPost() == 1) {
             ViewUtils.setVisible(mCommentContainer);
-            mCommentText.setText(String.valueOf(item.getComments().getCountComments()));
+            mCommentText.setText(String.valueOf(mItem.getComments().getCountComments()));
         } else {
             ViewUtils.setVisibilityGone(mCommentContainer);
         }
     }
+
 
     private Map<String, List> getAggregateData(final Iterable<Attachment> pAttachments) {
 

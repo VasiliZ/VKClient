@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private List<String> mListOfQuery;
     private static DBHelper INSTANCE;
+    private String TAG = DBHelper.class.getSimpleName();
 
     private DBHelper(final Context pContext, final VkDBConfig pVkDBConfig, final List<String> pListOfQuery) {
         super(pContext, pVkDBConfig.getDbName(), pVkDBConfig.getCursorFactory(), pVkDBConfig.getVersion());
@@ -30,8 +32,10 @@ public class DBHelper extends SQLiteOpenHelper {
         try {
             db.beginTransaction();
             for (int i = 0; i < mListOfQuery.size(); i++) {
+                Log.d(TAG, "onCreate: " + mListOfQuery.get(i));
                 db.execSQL(mListOfQuery.get(i));
             }
+            db.setTransactionSuccessful();
             db.endTransaction();
         } catch (final SQLException e) {
             e.fillInStackTrace();

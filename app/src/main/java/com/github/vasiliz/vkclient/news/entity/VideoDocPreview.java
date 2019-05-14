@@ -1,11 +1,20 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.github.vasiliz.vkclient.base.db.config.Field;
+import com.github.vasiliz.vkclient.base.db.config.Id;
+import com.github.vasiliz.vkclient.base.db.config.Table;
+import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.google.gson.annotations.SerializedName;
 
+@Table
 public class VideoDocPreview implements Parcelable {
+    @Id
+    private long idVideoPreview;
+    @Field
     @SerializedName("src")
     private String mSourse;
 
@@ -38,4 +47,11 @@ public class VideoDocPreview implements Parcelable {
             return new VideoDocPreview[size];
         }
     };
+
+    public ContentValues getContentValues(final long pidVideoDocPreview) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(ConstantStrings.DB.VideoDocPreviewTable.ID, pidVideoDocPreview);
+        contentValues.put(ConstantStrings.DB.VideoDocPreviewTable.SOURCE, mSourse);
+        return contentValues;
+    }
 }

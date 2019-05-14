@@ -10,8 +10,11 @@ public final class VkDBConfig {
     private List<String> listQueryForCreateTables;
     private SQLiteDatabase.CursorFactory mCursorFactory;
     private int mVersion;
+    private Context mContext;
 
-
+    public Context getContext() {
+        return mContext;
+    }
 
     public String getDbName() {
         return mDbName;
@@ -68,6 +71,7 @@ public final class VkDBConfig {
 
         public VkDBConfig build() {
             final VkDBConfig vkDBConfig = new VkDBConfig();
+            vkDBConfig.mContext = this.mContext;
             vkDBConfig.mDbName = this.mDbName;
             vkDBConfig.mVersion = this.mVersion;
             vkDBConfig.mCursorFactory = this.mInnerCursorFactory;

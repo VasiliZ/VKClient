@@ -1,18 +1,18 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.github.vasiliz.vkclient.base.db.config.Field;
 import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
+import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.google.gson.annotations.SerializedName;
-
-import java.io.Serializable;
 
 @Table
 public class Groups implements Parcelable {
-    @Field
+    @Id
     @SerializedName("id")
     private long mId;
     @Field
@@ -120,9 +120,10 @@ public class Groups implements Parcelable {
         dest.writeString(this.mUrlGroupPhoto50);
         dest.writeString(this.mUrlGroupPhoto100);
         dest.writeString(this.mUrlGroupPhoto200);
+
     }
 
-     private Groups(final Parcel in) {
+    private Groups(final Parcel in) {
         this.mId = in.readLong();
         this.mNameGroup = in.readString();
         this.mScreenName = in.readString();
@@ -143,5 +144,23 @@ public class Groups implements Parcelable {
         public Groups[] newArray(final int size) {
             return new Groups[size];
         }
+
+        public ContentValues mContentValues(final Parcel pParcel) {
+            return ContentValues.CREATOR.createFromParcel(pParcel);
+        }
     };
+
+    public ContentValues getContentValues() {
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(ConstantStrings.DB.GroupsTable.ID_GROUP, mId);
+        contentValues.put(ConstantStrings.DB.GroupsTable.NAME_GROUP, mNameGroup);
+        contentValues.put(ConstantStrings.DB.GroupsTable.SCREEN_NAME, mScreenName);
+        contentValues.put(ConstantStrings.DB.GroupsTable.IS_CLOSED, mIsClosed);
+        contentValues.put(ConstantStrings.DB.GroupsTable.TYPE, mType);
+        contentValues.put(ConstantStrings.DB.GroupsTable.PHOTO_50, mUrlGroupPhoto50);
+        contentValues.put(ConstantStrings.DB.GroupsTable.PHOTO_100, mUrlGroupPhoto100);
+        contentValues.put(ConstantStrings.DB.GroupsTable.PHOTO_200, mUrlGroupPhoto200);
+
+        return contentValues;
+    }
 }

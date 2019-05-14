@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 import com.github.vasiliz.myimageloader.ImageLoader;
 import com.github.vasiliz.vkclient.R;
+import com.github.vasiliz.vkclient.base.utils.SetImageUtils;
 import com.github.vasiliz.vkclient.news.entity.Photo;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureH
         final Photo photo = mPhotos.get(pI);
         ImageLoader.getInstance()
                 .with(mLayoutInflater.getContext())
-                .load(photo.getPhoto604())
+                .load(SetImageUtils.checkAttachmentImage(photo))
                 .into(pViewHolder.mImageView);
     }
 

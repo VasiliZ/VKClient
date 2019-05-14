@@ -1,20 +1,38 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.github.vasiliz.vkclient.base.db.config.Field;
+import com.github.vasiliz.vkclient.base.db.config.Id;
+import com.github.vasiliz.vkclient.base.db.config.Table;
+import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.google.gson.annotations.SerializedName;
 
+@Table
 public class Video implements Parcelable {
-
+    @Id
+    private long idVideo;
+    @Field
     @SerializedName("title")
     private String mTitleVideo;
+    @Field
     @SerializedName("src")
     private String mSource;
+    @Field
     @SerializedName("photo_800")
     private String mUrlPhotoVideo;
+    @Field
     @SerializedName("duration")
     private int mDurationVideo;
+
+    public Video(final String pTitleVideo, final String pSource, final String pUrlPhotoVideo, final int pDurationVideo) {
+        mTitleVideo = pTitleVideo;
+        mSource = pSource;
+        mUrlPhotoVideo = pUrlPhotoVideo;
+        mDurationVideo = pDurationVideo;
+    }
 
     public String getSource() {
         return mSource;
@@ -39,7 +57,7 @@ public class Video implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(final Parcel dest, final int flags) {
         dest.writeString(this.mTitleVideo);
         dest.writeString(this.mSource);
         dest.writeString(this.mUrlPhotoVideo);
@@ -49,7 +67,7 @@ public class Video implements Parcelable {
     public Video() {
     }
 
-    protected Video(Parcel in) {
+    protected Video(final Parcel in) {
         this.mTitleVideo = in.readString();
         this.mSource = in.readString();
         this.mUrlPhotoVideo = in.readString();
@@ -58,13 +76,23 @@ public class Video implements Parcelable {
 
     public static final Creator<Video> CREATOR = new Creator<Video>() {
         @Override
-        public Video createFromParcel(Parcel source) {
+        public Video createFromParcel(final Parcel source) {
             return new Video(source);
         }
 
         @Override
-        public Video[] newArray(int size) {
+        public Video[] newArray(final int size) {
             return new Video[size];
         }
     };
+
+    public ContentValues getContentValues(final long pIdVideo) {
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(ConstantStrings.DB.VideoTable.ID, pIdVideo);
+        contentValues.put(ConstantStrings.DB.VideoTable.TITLE, mTitleVideo);
+        contentValues.put(ConstantStrings.DB.VideoTable.SOURCE, mSource);
+        contentValues.put(ConstantStrings.DB.VideoTable.URL_PHOTO, mUrlPhotoVideo);
+        contentValues.put(ConstantStrings.DB.VideoTable.DURATION, mDurationVideo);
+        return contentValues;
+    }
 }

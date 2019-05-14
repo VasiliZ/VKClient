@@ -15,8 +15,7 @@
         android:theme="@style/noActionBar"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".login.ui.LoginActivity"
-            android:noHistory="true">
+            android:name=".login.ui.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

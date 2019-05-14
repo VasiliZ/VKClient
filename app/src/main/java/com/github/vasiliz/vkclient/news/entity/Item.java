@@ -1,23 +1,21 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.github.vasiliz.vkclient.base.db.config.Field;
 import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
+import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.google.gson.annotations.SerializedName;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Table
 public class Item implements Parcelable {
-
-    @Id
-    private Long mLong;
     @Field
     @SerializedName("type")
     private String mType;
@@ -27,7 +25,7 @@ public class Item implements Parcelable {
     @Field
     @SerializedName("date")
     private long mDate;
-    @Field
+    @Id
     @SerializedName("post_id")
     private int mPostId;
     @Field
@@ -51,8 +49,26 @@ public class Item implements Parcelable {
     @Field
     @SerializedName("views")
     private Views mViews;
+    @Field
+    private long mAddedAt;
 
     public Item() {
+    }
+
+
+    public Item(final String pType, final int pSourseId, final long pDate, final int pPostId, final String pPostType, final String pText, final List<Attachment> pAttachments, final Comments pComments, final Likes pLikes, final Reposts pReposts, final Views pViews, final long pAddedAt) {
+        mType = pType;
+        mSourseId = pSourseId;
+        mDate = pDate;
+        mPostId = pPostId;
+        mPostType = pPostType;
+        mText = pText;
+        mAttachments = pAttachments;
+        mComments = pComments;
+        mLikes = pLikes;
+        mReposts = pReposts;
+        mViews = pViews;
+        mAddedAt = pAddedAt;
     }
 
     public String getType() {
@@ -159,7 +175,6 @@ public class Item implements Parcelable {
 
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
-        dest.writeValue(this.mLong);
         dest.writeString(this.mType);
         dest.writeInt(this.mSourseId);
         dest.writeLong(this.mDate);
@@ -174,7 +189,6 @@ public class Item implements Parcelable {
     }
 
     private Item(final Parcel in) {
-        this.mLong = (Long) in.readValue(Long.class.getClassLoader());
         this.mType = in.readString();
         this.mSourseId = in.readInt();
         this.mDate = in.readLong();
@@ -200,4 +214,21 @@ public class Item implements Parcelable {
             return new Item[size];
         }
     };
+
+    public ContentValues getContentValues() {
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(ConstantStrings.DB.ItemTable.TYPE, mType);
+        contentValues.put(ConstantStrings.DB.ItemTable.SOURCE_ID, mSourseId);
+        contentValues.put(ConstantStrings.DB.ItemTable.DATE, mDate);
+        contentValues.put(ConstantStrings.DB.ItemTable.POST_ID, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.POST_TYPE, mPostType);
+        contentValues.put(ConstantStrings.DB.ItemTable.TEXT, mText);
+        contentValues.put(ConstantStrings.DB.ItemTable.ATTACHMENTS, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.COMMENTS, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.LIKES, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.REPOSTS, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.VIEWS, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.ADDED_AT, System.currentTimeMillis());
+        return contentValues;
+    }
 }

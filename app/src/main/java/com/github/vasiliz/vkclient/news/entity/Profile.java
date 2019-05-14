@@ -1,16 +1,19 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.github.vasiliz.vkclient.base.db.config.Field;
+import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
+import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.google.gson.annotations.SerializedName;
 
 @Table
 public class Profile implements Parcelable {
 
-    @Field
+    @Id
     @SerializedName("id")
     private long mId;
     @Field
@@ -142,4 +145,17 @@ public class Profile implements Parcelable {
             return new Profile[size];
         }
     };
+
+    public ContentValues getContentValues() {
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(ConstantStrings.DB.ProfileTable.ID, this.mId);
+        contentValues.put(ConstantStrings.DB.ProfileTable.FIRST_NAME, this.mFirstName);
+        contentValues.put(ConstantStrings.DB.ProfileTable.LAST_NAME, this.mLastName);
+        contentValues.put(ConstantStrings.DB.ProfileTable.SEX, this.mSex);
+        contentValues.put(ConstantStrings.DB.ProfileTable.SCREEN_NAME, this.mScreenName);
+        contentValues.put(ConstantStrings.DB.ProfileTable.PHOTO_50, this.mUrlPhoto50);
+        contentValues.put(ConstantStrings.DB.ProfileTable.PHOTO_100, this.mUrlPhoto100);
+        contentValues.put(ConstantStrings.DB.ProfileTable.ONLINE, this.mOnline);
+        return contentValues;
+    }
 }

@@ -1,16 +1,27 @@
 package com.github.vasiliz.vkclient.news.entity;
 
+import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.github.vasiliz.vkclient.base.db.config.Field;
+import com.github.vasiliz.vkclient.base.db.config.Table;
+import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.google.gson.annotations.SerializedName;
 
+@Table
 public class Views implements Parcelable {
-
-    @SerializedName("views")
+    @Field
+    private long mIdViews;
+    @Field
+    @SerializedName("count")
     private long mCountViews;
 
     public Views() {
+    }
+
+    public Views(final long pCountViews) {
+        mCountViews = pCountViews;
     }
 
     public long getCountViews() {
@@ -28,7 +39,7 @@ public class Views implements Parcelable {
         dest.writeLong(this.mCountViews);
     }
 
-    protected Views(final Parcel in) {
+    Views(final Parcel in) {
         this.mCountViews = in.readLong();
     }
 
@@ -43,4 +54,11 @@ public class Views implements Parcelable {
             return new Views[size];
         }
     };
+
+    public ContentValues getContentValues(final long pIdViews) {
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(ConstantStrings.DB.ViewsTable.ID, pIdViews);
+        contentValues.put(ConstantStrings.DB.ViewsTable.COUNT, mCountViews);
+        return contentValues;
+    }
 }

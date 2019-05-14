@@ -51,19 +51,24 @@ public class VkDatabaseCreator {
     private void createTableFields(final Annotation pDeclaredAnnotations, final Field pField, final List<String> pListForFields) {
 
         //noinspection ChainOfInstanceofChecks
-        //todo переделать ID на что нибудь другое
+
         if (pDeclaredAnnotations instanceof Id) {
-            pListForFields.add("id" + ConstantStrings.DB.CREATE_ID_COLUMN);
+            if (pField.getType().equals(String.class)) {
+                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.TEXT + ConstantStrings.DB.CREATE_ID_COLUMN);
+            } else if (pField.getType().equals(int.class)) {
+                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.INTEGER + ConstantStrings.DB.CREATE_ID_COLUMN);
+            } else if (pField.getType().equals(long.class)) {
+                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.LONG + ConstantStrings.DB.CREATE_ID_COLUMN);
+            }
         }
         if (pDeclaredAnnotations instanceof com.github.vasiliz.vkclient.base.db.config.Field) {
             if (pField.getType().equals(String.class)) {
-                pListForFields.add( pField.getName()
+                pListForFields.add(pField.getName()
                         + ConstantStrings.DB.Type.TEXT);
-            } else if ((pField.getType().equals(int.class))
-                    || (pField.getType().equals(long.class))) {
-                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.INTEGER);
+            } else if ((pField.getType().equals(long.class))) {
+                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.LONG);
             } else {
-                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.TEXT);
+                pListForFields.add(pField.getName() + ConstantStrings.DB.Type.INTEGER);
             }
         }
     }

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.github.vasiliz.myimageloader.ImageLoader;
 import com.github.vasiliz.vkclient.R;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
+import com.github.vasiliz.vkclient.base.utils.SetImageUtils;
 import com.github.vasiliz.vkclient.base.utils.ViewUtils;
 import com.github.vasiliz.vkclient.news.entity.Audio;
 import com.github.vasiliz.vkclient.news.entity.Doc;
@@ -303,7 +304,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mImageLink.setAdjustViewBounds(true);
                 ImageLoader.getInstance()
                         .with(mLayoutInflater.getContext())
-                        .load(link.getPhoto().getPhoto604())
+                        .load(SetImageUtils.checkAttachmentImage(link.getPhoto()))
                         .into(mImageLink);
             } else {
                 ViewUtils.setVisibilityGone(mImageLink);
