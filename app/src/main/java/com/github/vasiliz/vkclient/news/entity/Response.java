@@ -9,6 +9,7 @@ public class Response implements Parcelable {
     @SerializedName("response")
     private ResponseNews mResponseNews;
 
+
     public Response() {
     }
 

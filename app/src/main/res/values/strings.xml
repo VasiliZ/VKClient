@@ -6,4 +6,5 @@
     <string name="like_image">like</string>
     <string name="comment_image">comment</string>
     <string name="repost_image">repost</string>
+    <string name="news_toolbar_title">Новости</string>
 </resources>

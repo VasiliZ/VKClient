@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.github.vasiliz.vkclient.news.entity.Response;
+import com.github.vasiliz.vkclient.news.ui.adapters.NewsAdapter;
 
 public abstract class IAbstractTask<T>
         implements
@@ -84,4 +85,7 @@ public abstract class IAbstractTask<T>
         };
         handler.post(runnable);
     }
+
+
+
 }

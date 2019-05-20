@@ -8,9 +8,12 @@ import com.github.vasiliz.vkclient.base.services.IDataExecutorService;
 import com.github.vasiliz.vkclient.base.streams.HttpInputStreamProvider;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.github.vasiliz.vkclient.base.utils.IOUtils;
+import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.observer.Observable;
 import com.github.vasiliz.vkclient.news.observer.Observer;
+import com.github.vasiliz.vkclient.news.ui.INewsModel;
+import com.github.vasiliz.vkclient.news.ui.adapters.NewsViewHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -20,7 +23,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class NewsModel extends IAbstractTask<Response> implements Observable<Response> {
+public class NewsModel extends IAbstractTask<Response> implements Observable<Response>, INewsModel {
 
     private final Collection<Observer> mObservers = new ArrayList<Observer>();
 
@@ -29,21 +32,30 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
     private final String mAccessToken;
     private String mNextFromNews;
     private Response mResponse;
+    private final IDataExecutorService mIDataExecutorService;
+    private NewsViewHolder mNewsAdapter;
 
     private final IMainPresenter mIMainPresenter;
 
     private final CreateRequest mCreateRequest = VkApplication.getCreateRequest();
     private final CreateRequest mLoadMoreNews = VkApplication.getmLoadMoreNewsApiTemplate();
+    private String ERROR = "error";
 
     public NewsModel(final IDataExecutorService pIDataExecutorService, final String pAccessToken, final IMainPresenter pMainPresenter) {
         super(pIDataExecutorService);
         mIMainPresenter = pMainPresenter;
         mAccessToken = pAccessToken;
+        mIDataExecutorService = pIDataExecutorService;
     }
 
     @Override
     public Response executeLocal() {
         return mAppDB.getSaveData();
+    }
+
+    @Override
+    public Response executeNetwork() {
+        return null;
     }
 
     @SuppressWarnings("BooleanParameter")
@@ -74,7 +86,7 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
                 byteArrayOutputStream.write(res);
                 res = inputStream.read();
             }
-            if (byteArrayOutputStream.toString().contains("error")) {
+            if (byteArrayOutputStream.toString().contains(ERROR)) {
                 mIMainPresenter.goToLogin();
                 return null;
             }
@@ -130,4 +142,23 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
     void saveData(final Response pResponse) {
         mResponse = pResponse;
     }
+
+
+    @Override
+    public void doLike(final Item pItem) {
+        final SetLike setLike = new SetLike(mAccessToken, pItem, this, mIDataExecutorService);
+        setLike.registerObserver(mNewsAdapter);
+        mIDataExecutorService.doNetworkTask(setLike);
+    }
+
+    @Override
+    public void errorDoLike() {
+        mIMainPresenter.showToast();
+    }
+
+    public void registerLikeOnserver(final NewsViewHolder pNewsViewHolder) {
+        mNewsAdapter = pNewsViewHolder;
+    }
+
+
 }

@@ -7,9 +7,6 @@ import com.github.vasiliz.vkclient.news.entity.Response;
 
 public interface IMainView extends VkBaseView {
 
-
-    void setDataToAdapter(Response pResponse);
-
     void dataLastPage(boolean pIsReady);
 
     void loadMoreData(boolean pIsLoading);
@@ -19,5 +16,10 @@ public interface IMainView extends VkBaseView {
     void onLoadError();
 
     void goToLogin();
+
+    void showNotify();
+
+
+    void setDataToAdapter(Response pMessage);
 
 }

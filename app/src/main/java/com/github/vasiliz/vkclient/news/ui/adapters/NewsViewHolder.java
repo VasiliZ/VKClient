@@ -1,10 +1,11 @@
-package com.github.vasiliz.vkclient.news.newsItem;
+package com.github.vasiliz.vkclient.news.ui.adapters;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -12,11 +13,8 @@ import com.github.vasiliz.myapplication.ExpandableTextView;
 import com.github.vasiliz.myimageloader.ImageLoader;
 import com.github.vasiliz.vkclient.R;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
-import com.github.vasiliz.vkclient.base.utils.SetImageUtils;
 import com.github.vasiliz.vkclient.base.utils.StringUtils;
 import com.github.vasiliz.vkclient.base.utils.ViewUtils;
-import com.github.vasiliz.vkclient.mymvp.VkActivity;
-import com.github.vasiliz.vkclient.mymvp.VkPresenter;
 import com.github.vasiliz.vkclient.news.entity.Attachment;
 import com.github.vasiliz.vkclient.news.entity.Audio;
 import com.github.vasiliz.vkclient.news.entity.Doc;
@@ -25,8 +23,10 @@ import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Link;
 import com.github.vasiliz.vkclient.news.entity.Photo;
 import com.github.vasiliz.vkclient.news.entity.Profile;
+import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.entity.Video;
-import com.github.vasiliz.vkclient.news.ui.adapters.AttachmentAdapter;
+import com.github.vasiliz.vkclient.news.observer.SetLikeObserver;
+import com.github.vasiliz.vkclient.news.ui.listeners.OnClickListener;
 import com.github.vasiliz.vkclient.news.ui.views.CircleImage;
 
 import java.util.ArrayList;
@@ -34,72 +34,78 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NewsItemActivity extends VkActivity {
-    private CircleImage mCircleView;
-    private ExpandableTextView mTextNews;
-    private TextView mName;
-    private TextView mDate;
-    private TextView mLikeText;
-    private TextView mCommentText;
-    private TextView mRepostText;
-    private LinearLayout mCommentContainer;
-    private RecyclerView mAttachmentsContainer;
-    private List<Groups> mGroups;
-    private List<Profile> mProfiles;
+public class NewsViewHolder extends RecyclerView.ViewHolder implements SetLikeObserver<Response> {
+
+    private final CircleImage mCircleView;
+    private final ExpandableTextView mTextNews;
+    private final TextView mName;
+    private final TextView mDate;
+    private final TextView mLikeText;
+    private final TextView mCommentText;
+    private final TextView mRepostText;
+    private final LinearLayout mCommentContainer;
+    private final RecyclerView mAttachmentsContainer;
+    private final View mView;
+    private final LinearLayout mHeaderNews;
+    private final LinearLayout mLikeContainer;
     private Item mItem;
+    private int mItemId;
+    private NewsAdapter mNewsAdapter;
+    private ImageLoader mImageLoader = ImageLoader.getInstance();
+    private LayoutInflater mLayoutInflater;
+    private List<Profile> mProfiles = new ArrayList<Profile>();
+    private List<Groups> mGroups = new ArrayList<Groups>();
+    private OnClickListener mOnClickListener;
 
 
-    private String TAG = NewsItemActivity.class.getSimpleName();
-
-    @Override
-    protected VkPresenter initPresenter() {
-        return new NewsItemPresenterImpl();
+    public NewsViewHolder(@NonNull final View itemView, final LayoutInflater pLayoutInflater,
+                          final List<Groups> pGroups, final List<Profile> pProfiles,
+                          final OnClickListener pOnClickListener) {
+        super(itemView);
+        mView = itemView;
+        mCircleView = itemView.findViewById(R.id.avatar_image_view);
+        mTextNews = itemView.findViewById(R.id.news_text_view);
+        mName = itemView.findViewById(R.id.name_group_or_profile_text_view);
+        mDate = itemView.findViewById(R.id.time_post_text_view);
+        mLikeText = itemView.findViewById(R.id.like_text_view);
+        mCommentText = itemView.findViewById(R.id.comment_text_view);
+        mRepostText = itemView.findViewById(R.id.repost_text_view);
+        mCommentContainer = itemView.findViewById(R.id.comment_container);
+        mAttachmentsContainer = itemView.findViewById(R.id.attachments_container);
+        mHeaderNews = itemView.findViewById(R.id.header_item_layout);
+        mLikeContainer = itemView.findViewById(R.id.like_container);
+        mLayoutInflater = pLayoutInflater;
+        mProfiles.addAll(pProfiles);
+        mGroups.addAll(pGroups);
+        mOnClickListener = pOnClickListener;
     }
 
-    @Override
-    protected void onCreate(@Nullable final Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.single_item_news);
-        final Intent intent = getIntent();
-        final Bundle bundle = intent.getExtras();
-        if (bundle != null) {
-            mGroups = bundle.getParcelableArrayList(ConstantStrings.AppConst.BUNDLE_GROUPS);
-            mProfiles = bundle.getParcelableArrayList(ConstantStrings.AppConst.PROFILES);
-            mItem = bundle.getParcelable(ConstantStrings.AppConst.ITEMS);
-        }
 
-        init();
-        setDataOnView();
-    }
-
-    private void init() {
-        mCircleView = findViewById(R.id.avatar_image_view);
-        mTextNews = findViewById(R.id.news_text_view);
-        mName = findViewById(R.id.name_group_or_profile_text_view);
-        mDate = findViewById(R.id.time_post_text_view);
-        mLikeText = findViewById(R.id.like_text_view);
-        mCommentText = findViewById(R.id.comment_text_view);
-        mRepostText = findViewById(R.id.repost_text_view);
-        mCommentContainer = findViewById(R.id.comment_container);
-        mAttachmentsContainer = findViewById(R.id.attachments_container);
-
-    }
-
-    private void setDataOnView() {
-        final Groups group = getGroup(mItem);
+    void onBind(Item pItem, Context pContext) {
+        mItem = pItem;
+        final Groups groups = getGroup(mItem);
         final Profile profile = getProfile(mItem);
 
-        if (group != null) {
-            ImageLoader.getInstance()
-                    .with(this)
-                    .load(SetImageUtils.chechAvatarGroup(group))
+        final View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                mOnClickListener.onItemClick(mItem, mGroups, mProfiles);
+            }
+        };
+
+        mHeaderNews.setOnClickListener(onClickListener);
+
+        if (groups != null) {
+            mImageLoader
+                    .with(mLayoutInflater.getContext())
+                    .load(groups.getUrlGroupPhoto100())
                     .into(mCircleView);
-            mName.setText(group.getNameGroup());
+            mName.setText(groups.getNameGroup());
         } else if (profile != null) {
 
-            ImageLoader.getInstance()
-                    .with(this)
-                    .load(SetImageUtils.checkAvatarProfile(profile))
+            mImageLoader
+                    .with(mLayoutInflater.getContext())
+                    .load(profile.getUrlPhoto100())
                     .into(mCircleView);
             mName.setText(String
                     .format(profile.getFirstName() + "%s" + profile.getLastName(), " "));
@@ -109,19 +115,35 @@ public class NewsItemActivity extends VkActivity {
         } else {
             ViewUtils.setVisible(mTextNews);
             mTextNews.setContent(mItem.getText());
+            mTextNews.setOnClickListener(onClickListener);
         }
 
-        mDate.setText(StringUtils.getDateFromLong(mItem.getDate()));
+        mCircleView.setImageResource(R.drawable.test_drawable);
 
+        mDate.setText(StringUtils.getDateFromLong(mItem.getDate()));
+        mLikeContainer.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(final View v) {
+                if (mItem.getLikes().getCanLike() == 1 && mItem.getLikes().getUserLike() == 0) {
+                    mItemId = mItem.getPostId();
+                }
+            }
+        });
+        if (mItem.getLikes().getUserLike() == 1) {
+            mLikeText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.read_heart, 0, 0, 0);
+        } else {
+            mLikeText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.like_24dp, 0, 0, 0);
+        }
         mRepostText.setText(String.valueOf(mItem.getReposts().getCountReposts()));
         //footer item
         mLikeText.setText(String.valueOf(mItem.getLikes().getCountLike()));
         //attachments content
         if (mItem.getAttachments() != null) {
             ViewUtils.setVisible(mAttachmentsContainer);
-            final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+            final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(mLayoutInflater.getContext());
             linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-            final AttachmentAdapter attachmentAdapter = new AttachmentAdapter(this);
+            final AttachmentAdapter attachmentAdapter = new AttachmentAdapter(mLayoutInflater.getContext());
             attachmentAdapter.setData(getAggregateData(mItem.getAttachments()));
             mAttachmentsContainer.setLayoutManager(linearLayoutManager);
             mAttachmentsContainer.setAdapter(attachmentAdapter);
@@ -135,12 +157,13 @@ public class NewsItemActivity extends VkActivity {
         } else {
             ViewUtils.setVisibilityGone(mCommentContainer);
         }
-    }
 
+
+    }
 
     private Map<String, List> getAggregateData(final Iterable<Attachment> pAttachments) {
 
-        //copy history type
+//copy history type
         final Map<String, List> fullContentList = new LinkedHashMap<String, List>();
         final List<Photo> photos = new ArrayList<Photo>();
         final List<Audio> audioList = new ArrayList<Audio>();
@@ -219,5 +242,49 @@ public class NewsItemActivity extends VkActivity {
         return null;
     }
 
-}
+    @Override
+    public void addLike(final Response message) {
+/*
+        final List<Item> items = new ArrayList<Item>(mItems);
+        Item concreteItem = null;
+        for (final Item item : items) {
+            if (item.getPostId() == mItemId) {
+                concreteItem = item;
+            }
+        }
 
+        final Likes likes = concreteItem.getLikes();
+
+        likes.setCountLike(message.getResponseNews().likes);
+        likes.setUserLike(1);
+        likes.setCanLike(0);
+        concreteItem.setLikes(likes);
+        items.add(concreteItem);
+        mItems.clear();
+        mItems.addAll(items);
+
+    }*/
+
+
+       /* public void setItems ( final Response pResponseNews){
+            final List<Item> items = pResponseNews.getResponseNews().getItemList();
+            final List<Groups> groups = pResponseNews.getResponseNews().getGroupsList();
+            final List<Profile> profiles = pResponseNews.getResponseNews().getProfileList();
+
+            mItems.clear();
+            mItems.addAll(items);
+            mGroups.addAll(groups);
+            mProfiles.addAll(profiles);
+
+        }
+
+        private void add ( final Item pItem){
+            mItems.add(pItem);
+        }
+
+        public void udateList ( final List<Item> items){
+
+
+        }*/
+    }
+}

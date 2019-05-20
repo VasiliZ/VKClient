@@ -8,6 +8,9 @@ import java.util.concurrent.TimeUnit;
 public interface INetworkTask<T> {
 
     @WorkerThread
+    T executeNetwork();
+
+    @WorkerThread
     T executeNetwork(boolean isLoadMore);
 
     @WorkerThread

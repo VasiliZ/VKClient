@@ -6,13 +6,16 @@ import android.arch.lifecycle.OnLifecycleEvent;
 
 import com.github.vasiliz.vkclient.base.services.ExecutorDataServiceImpl;
 import com.github.vasiliz.vkclient.mymvp.VkPresenter;
+import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.ui.IMainView;
+import com.github.vasiliz.vkclient.news.ui.adapters.NewsAdapter;
+import com.github.vasiliz.vkclient.news.ui.adapters.NewsViewHolder;
 
 public class MainPresenterImpl extends VkPresenter<IMainView> implements IMainPresenter, LifecycleObserver {
 
     private static final String TAG = MainPresenterImpl.class.getSimpleName();
-    private final IMainView mINewsView;
+    private IMainView mINewsView;
     private final NewsModel mNewsModel;
     private String mNexttNews;
 
@@ -44,11 +47,28 @@ public class MainPresenterImpl extends VkPresenter<IMainView> implements IMainPr
         mINewsView.goToLogin();
     }
 
+    @Override
+    public void doLike(Item pItem) {
+        mNewsModel.doLike(pItem);
+    }
+
+    @Override
+    public void showToast() {
+        mINewsView.showNotify();
+    }
+
+    @Override
+    public void registredObsertver(final NewsViewHolder pNewsViewHolder) {
+        mNewsModel.registerLikeOnserver(pNewsViewHolder);
+    }
+
+
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     private void destroy() {
         if (mINewsView != null) {
             mINewsView.getLifecycle().removeObserver(this);
         }
+        mINewsView = null;
     }
 
 

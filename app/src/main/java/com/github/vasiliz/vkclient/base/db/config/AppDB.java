@@ -107,7 +107,7 @@ public final class AppDB {
             database.setTransactionSuccessful();
         } catch (final Exception e) {
             e.fillInStackTrace();
-            //   Log.d(TAG, "Error while trying read data to db");
+            //   Log.d(TAG, "ErrorRequest while trying read data to db");
         } finally {
             database.endTransaction();
             database.close();

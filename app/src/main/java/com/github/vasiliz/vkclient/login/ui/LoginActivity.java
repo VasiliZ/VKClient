@@ -38,7 +38,9 @@ public class LoginActivity extends VkActivity {
     public void goToMainScreen() {
         final Intent intent = new Intent(this, VkMainActivity.class);
         intent.putExtra(ConstantStrings.ApiVK.TOKEN_NAME, mLoginPresenter.getToken());
+
         startActivity(intent);
+        this.finish();
 
     }
 

@@ -25,7 +25,7 @@ public final class SetImageUtils {
         }
     }
 
-    public static String checkAttachmentImage(Photo pPhoto){
+    public static String checkAttachmentImage(final Photo pPhoto){
         if (pPhoto.getPhoto1280()!=null){
             return pPhoto.getPhoto1280();
         }else if (pPhoto.getPhoto807()!=null){

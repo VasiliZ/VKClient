@@ -17,6 +17,8 @@ public class ResponseNews implements Parcelable {
     private List<Groups> mGroupsList;
     @SerializedName("next_from")
     private String mNextNews;
+    @SerializedName("likes")
+    public int likes;
 
     public ResponseNews() {
     }

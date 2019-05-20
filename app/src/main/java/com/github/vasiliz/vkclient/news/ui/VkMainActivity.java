@@ -2,12 +2,14 @@ package com.github.vasiliz.vkclient.news.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import com.github.vasiliz.vkclient.R;
@@ -21,6 +23,7 @@ import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Profile;
 import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.newsItem.NewsItemActivity;
+import com.github.vasiliz.vkclient.news.ui.adapters.ItemsAdapter;
 import com.github.vasiliz.vkclient.news.ui.adapters.NewsAdapter;
 import com.github.vasiliz.vkclient.news.ui.listeners.OnClickListener;
 import com.github.vasiliz.vkclient.news.ui.listeners.PaginationScrollListener;
@@ -35,13 +38,13 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
     private NewsAdapter mNewsAdapter;
     private boolean isLastPage;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private String mAccessKey;
     private boolean isLoading;
+    private ItemsAdapter mItemsAdapter;
 
     @Override
     public void onRefresh() {
         isLastPage = false;
-        mNewsAdapter.clear();
+
         mIMainPresenter.loadNews();
     }
 
@@ -50,6 +53,23 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vk_main_layout);
         getLifecycleRegistry().addObserver(mIMainPresenter);
+
+        final Toolbar toolbar = findViewById(R.id.tool_bar);
+        toolbar.setTitleTextColor(Color.WHITE);
+        toolbar.setTitle(R.string.news_toolbar_title);
+        setSupportActionBar(toolbar);
+       /* ListAdapter listAdapter = new ListAdapter() {
+            @NonNull
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup pViewGroup, int pI) {
+                return null;
+            }
+
+            @Override
+            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder pViewHolder, int pI) {
+
+            }
+        };*/
         mRecyclerView = findViewById(R.id.news_recycler_view);
         mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
         initRecyclerView();
@@ -66,35 +86,35 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
     @Override
     protected VkPresenter initPresenter() {
         final Intent intent = getIntent();
-        mAccessKey = intent.getStringExtra(ConstantStrings.ApiVK.TOKEN_NAME);
+        final String accessKey = intent.getStringExtra(ConstantStrings.ApiVK.TOKEN_NAME);
         return mIMainPresenter =
-                new MainPresenterImpl(this, mAccessKey);
+                new MainPresenterImpl(this, accessKey);
 
     }
 
     public void initRecyclerView() {
-        mNewsAdapter = new NewsAdapter(this, new OnClickListener() {
+        mItemsAdapter = new ItemsAdapter(this, new OnClickListener() {
             @Override
             public void onItemClick(final Item pItem, final List<Groups> pGroups, final List<Profile> pProfiles) {
                 final Intent intent = new Intent(VkMainActivity.this, NewsItemActivity.class);
                 final Bundle bundle = new Bundle();
-                bundle.putParcelableArrayList("groups", new ArrayList<Parcelable>(pGroups));
-                bundle.putParcelable("item", pItem);
-                bundle.putParcelableArrayList("profiles", new ArrayList<Parcelable>(pProfiles));
+                bundle.putParcelableArrayList(ConstantStrings.AppConst.BUNDLE_GROUPS, new ArrayList<Parcelable>(pGroups));
+                bundle.putParcelable(ConstantStrings.AppConst.ITEMS, pItem);
+                bundle.putParcelableArrayList(ConstantStrings.AppConst.PROFILES, new ArrayList<Parcelable>(pProfiles));
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
+
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        mRecyclerView.setAdapter(mNewsAdapter);
+        mRecyclerView.setAdapter(mItemsAdapter);
 
         mRecyclerView.addOnScrollListener(new PaginationScrollListener(linearLayoutManager) {
 
             @Override
             protected void loadMoreItems() {
                 isLoading = true;
-                //    currentPage++;
                 mIMainPresenter.loadMoreNews();
             }
 
@@ -110,9 +130,6 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
         });
     }
 
-    public void setDataToAdapter(final Response pData) {
-        mNewsAdapter.setItems(pData);
-    }
 
     @Override
     public void dataLastPage(final boolean pIsLastPage) {
@@ -142,6 +159,19 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
         editor.apply();
         final Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void showNotify() {
+        Toast.makeText(this, "error set like", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setDataToAdapter(final Response pMessage) {
+        mItemsAdapter.submitOtherInfo(pMessage.getResponseNews().getProfileList(),
+                pMessage.getResponseNews().getGroupsList());
+        mItemsAdapter.submitList(pMessage.getResponseNews().getItemList());
+        mItemsAdapter.notifyDataSetChanged();
     }
 
     @Override

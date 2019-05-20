@@ -10,6 +10,7 @@ public interface ConstantStrings {
         String TOKEN_NAME = "vkToken";
         String API_VERSION = "5.69";
         String FILTER_FOR_REQUEST = "post";
+        CharSequence ERROR = "error";
     }
 
     interface TypesAttachment {
@@ -208,6 +209,9 @@ public interface ConstantStrings {
 
     interface AppConst {
         String SAVE_NEWS = "allNews";
+        String BUNDLE_GROUPS = "groups";
+        String PROFILES = "profiles";
+        String ITEMS = "items";
     }
 
 }

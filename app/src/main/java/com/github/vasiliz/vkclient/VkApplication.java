@@ -4,6 +4,7 @@ import android.app.Application;
 import android.os.StrictMode;
 
 import com.github.vasiliz.myimageloader.ImageLoader;
+import com.github.vasiliz.vkclient.api.AddLike;
 import com.github.vasiliz.vkclient.api.LoadMoreNews;
 import com.github.vasiliz.vkclient.api.RequestNews;
 import com.github.vasiliz.vkclient.base.api.CreateRequest;
@@ -20,6 +21,7 @@ public class VkApplication extends Application {
     private static ImageLoader mImageLoader;
     private static CreateRequest mCreateRequest;
     private static CreateRequest mLoadMoreNews;
+    private static CreateRequest mDoLike;
     private static DBHelper mDBHelper;
 
     @Override
@@ -68,6 +70,11 @@ public class VkApplication extends Application {
                 .setBaseUrl("https://api.vk.com/")
                 .setServiceClass(LoadMoreNews.class)
                 .build();
+
+        mDoLike = new CreateRequest.Builder()
+                .setBaseUrl("https://api.vk.com/")
+                .setServiceClass(AddLike.class)
+                .build();
     }
 
     public static CreateRequest getmLoadMoreNewsApiTemplate() {
@@ -76,6 +83,10 @@ public class VkApplication extends Application {
 
     public static CreateRequest getCreateRequest() {
         return mCreateRequest;
+    }
+
+    public static CreateRequest getmDoLike() {
+        return mDoLike;
     }
 
     public static ImageLoader getmImageLoader() {

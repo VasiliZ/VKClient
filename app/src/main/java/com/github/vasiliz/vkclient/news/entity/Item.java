@@ -3,6 +3,8 @@ package com.github.vasiliz.vkclient.news.entity;
 import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 
 import com.github.vasiliz.vkclient.base.db.config.Field;
 import com.github.vasiliz.vkclient.base.db.config.Id;
@@ -162,11 +164,6 @@ public class Item implements Parcelable {
         mViews = pViews;
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
 
     @Override
     public int describeContents() {
@@ -231,4 +228,58 @@ public class Item implements Parcelable {
         contentValues.put(ConstantStrings.DB.ItemTable.ADDED_AT, System.currentTimeMillis());
         return contentValues;
     }
+
+    @Override
+    public boolean equals(Object pO) {
+        if (this == pO) return true;
+        if (pO == null || getClass() != pO.getClass()) return false;
+
+        Item item = (Item) pO;
+
+        if (mSourseId != item.mSourseId) return false;
+        if (mDate != item.mDate) return false;
+        if (mPostId != item.mPostId) return false;
+        if (mAddedAt != item.mAddedAt) return false;
+        if (mType != null ? !mType.equals(item.mType) : item.mType != null) return false;
+        if (mPostType != null ? !mPostType.equals(item.mPostType) : item.mPostType != null)
+            return false;
+        if (mText != null ? !mText.equals(item.mText) : item.mText != null) return false;
+        if (mAttachments != null ? !mAttachments.equals(item.mAttachments) : item.mAttachments != null)
+            return false;
+        if (mComments != null ? !mComments.equals(item.mComments) : item.mComments != null)
+            return false;
+        if (mLikes != null ? !mLikes.equals(item.mLikes) : item.mLikes != null) return false;
+        if (mReposts != null ? !mReposts.equals(item.mReposts) : item.mReposts != null)
+            return false;
+        return mViews != null ? mViews.equals(item.mViews) : item.mViews == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = mType != null ? mType.hashCode() : 0;
+        result = 31 * result + mSourseId;
+        result = 31 * result + (int) (mDate ^ (mDate >>> 32));
+        result = 31 * result + mPostId;
+        result = 31 * result + (mPostType != null ? mPostType.hashCode() : 0);
+        result = 31 * result + (mText != null ? mText.hashCode() : 0);
+        result = 31 * result + (mAttachments != null ? mAttachments.hashCode() : 0);
+        result = 31 * result + (mComments != null ? mComments.hashCode() : 0);
+        result = 31 * result + (mLikes != null ? mLikes.hashCode() : 0);
+        result = 31 * result + (mReposts != null ? mReposts.hashCode() : 0);
+        result = 31 * result + (mViews != null ? mViews.hashCode() : 0);
+        result = 31 * result + (int) (mAddedAt ^ (mAddedAt >>> 32));
+        return result;
+    }
+
+    public static final DiffUtil.ItemCallback<Item> DIFF_CALLBACK = new DiffUtil.ItemCallback<Item>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Item pItem, @NonNull Item pValue1) {
+            return pItem.getPostId() == pValue1.getPostId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Item pItem, @NonNull Item pValue1) {
+            return pItem.equals(pValue1);
+        }
+    };
 }

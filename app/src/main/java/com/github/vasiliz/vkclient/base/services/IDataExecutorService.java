@@ -7,5 +7,4 @@ public interface IDataExecutorService {
     <T> void doDatabaseTask(final IDataBaseTask<T> pDataBaseTask);
 
     <T> void doSaveToCacheTask(final ISaveToCacheTask<T> pSaveToCacheTask, T data);
-
 }
