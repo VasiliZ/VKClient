@@ -229,12 +229,28 @@ public class Item implements Parcelable {
         return contentValues;
     }
 
+    public ContentValues updateItem(){
+        final ContentValues contentValues = new ContentValues();
+        contentValues.put(ConstantStrings.DB.ItemTable.TYPE, mType);
+        contentValues.put(ConstantStrings.DB.ItemTable.SOURCE_ID, mSourseId);
+        contentValues.put(ConstantStrings.DB.ItemTable.DATE, mDate);
+        contentValues.put(ConstantStrings.DB.ItemTable.POST_ID, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.POST_TYPE, mPostType);
+        contentValues.put(ConstantStrings.DB.ItemTable.TEXT, mText);
+        contentValues.put(ConstantStrings.DB.ItemTable.ATTACHMENTS, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.COMMENTS, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.LIKES, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.REPOSTS, mPostId);
+        contentValues.put(ConstantStrings.DB.ItemTable.VIEWS, mPostId);
+        return contentValues;
+    }
+
     @Override
-    public boolean equals(Object pO) {
+    public boolean equals(final Object pO) {
         if (this == pO) return true;
         if (pO == null || getClass() != pO.getClass()) return false;
 
-        Item item = (Item) pO;
+        final Item item = (Item) pO;
 
         if (mSourseId != item.mSourseId) return false;
         if (mDate != item.mDate) return false;
@@ -273,13 +289,14 @@ public class Item implements Parcelable {
 
     public static final DiffUtil.ItemCallback<Item> DIFF_CALLBACK = new DiffUtil.ItemCallback<Item>() {
         @Override
-        public boolean areItemsTheSame(@NonNull Item pItem, @NonNull Item pValue1) {
+        public boolean areItemsTheSame(@NonNull final Item pItem, @NonNull final Item pValue1) {
             return pItem.getPostId() == pValue1.getPostId();
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull Item pItem, @NonNull Item pValue1) {
-            return pItem.equals(pValue1);
+        public boolean areContentsTheSame(@NonNull final Item pItem, @NonNull final Item pValue1) {
+            return pItem.getLikes().equals(pValue1.getLikes());
         }
     };
+
 }

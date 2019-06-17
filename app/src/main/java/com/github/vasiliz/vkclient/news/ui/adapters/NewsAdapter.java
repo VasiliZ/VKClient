@@ -14,6 +14,7 @@ import com.github.vasiliz.vkclient.news.MainPresenterImpl;
 import com.github.vasiliz.vkclient.news.entity.Groups;
 import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Profile;
+import com.github.vasiliz.vkclient.news.ui.adapters.holders.NewsViewHolder;
 import com.github.vasiliz.vkclient.news.ui.listeners.OnClickListener;
 
 import java.util.ArrayList;

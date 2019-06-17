@@ -3,10 +3,7 @@ package com.github.vasiliz.vkclient.base.services;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.github.vasiliz.vkclient.news.entity.Response;
-import com.github.vasiliz.vkclient.news.ui.adapters.NewsAdapter;
-
-public abstract class IAbstractTask<T>
+public abstract class IAbstractTask<V, T>
         implements
         ITask<T>,
         INetworkTask<T>,
@@ -42,12 +39,14 @@ public abstract class IAbstractTask<T>
         try {
             final T result = executeLocal();
             if (result != null) {
-                runOnUIThread(result);
+                runAfterDBTaskOnUIThread(result);
             }
         } catch (final Exception e) {
             onError(e);
         }
     }
+
+    public abstract V merge(T pT);
 
     @Override
     public void onError(final Throwable pThrowable) {
@@ -64,9 +63,13 @@ public abstract class IAbstractTask<T>
         mIDataExecutorService.doSaveToCacheTask(this, pData);
     }
 
-    public void doTask(final boolean pLoadMore){
+    public void doTask(final boolean pLoadMore) {
         isLoadMoreData = pLoadMore;
         mIDataExecutorService.doNetworkTask(this);
+    }
+
+    public void databaseTask(){
+        mIDataExecutorService.doDatabaseTask(this);
     }
 
     @Override
@@ -81,6 +84,18 @@ public abstract class IAbstractTask<T>
             @Override
             public void run() {
                 postExecute(result);
+            }
+        };
+        handler.post(runnable);
+    }
+
+    private void runAfterDBTaskOnUIThread(final T result) {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final Runnable runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                postDataBaseExecute(result);
             }
         };
         handler.post(runnable);

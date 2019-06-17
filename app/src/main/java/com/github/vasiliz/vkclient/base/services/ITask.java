@@ -15,6 +15,8 @@ public interface ITask<T> {
 
     void postExecute(T pT);
 
+    void postDataBaseExecute(T pT);
+
     void cancelTask();
 
 }

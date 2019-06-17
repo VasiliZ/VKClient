@@ -1,4 +1,4 @@
-package com.github.vasiliz.vkclient.news.ui.adapters;
+package com.github.vasiliz.vkclient.news.ui.adapters.holders;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -23,9 +23,9 @@ import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Link;
 import com.github.vasiliz.vkclient.news.entity.Photo;
 import com.github.vasiliz.vkclient.news.entity.Profile;
-import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.entity.Video;
-import com.github.vasiliz.vkclient.news.observer.SetLikeObserver;
+import com.github.vasiliz.vkclient.news.ui.IMainView;
+import com.github.vasiliz.vkclient.news.ui.adapters.AttachmentAdapter;
 import com.github.vasiliz.vkclient.news.ui.listeners.OnClickListener;
 import com.github.vasiliz.vkclient.news.ui.views.CircleImage;
 
@@ -34,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NewsViewHolder extends RecyclerView.ViewHolder implements SetLikeObserver<Response> {
+public class NewsViewHolder extends RecyclerView.ViewHolder {
 
     private final CircleImage mCircleView;
     private final ExpandableTextView mTextNews;
@@ -49,13 +49,11 @@ public class NewsViewHolder extends RecyclerView.ViewHolder implements SetLikeOb
     private final LinearLayout mHeaderNews;
     private final LinearLayout mLikeContainer;
     private Item mItem;
-    private int mItemId;
-    private NewsAdapter mNewsAdapter;
-    private ImageLoader mImageLoader = ImageLoader.getInstance();
-    private LayoutInflater mLayoutInflater;
-    private List<Profile> mProfiles = new ArrayList<Profile>();
-    private List<Groups> mGroups = new ArrayList<Groups>();
-    private OnClickListener mOnClickListener;
+    private final ImageLoader mImageLoader = ImageLoader.getInstance();
+    private final LayoutInflater mLayoutInflater;
+    private final List<Profile> mProfiles = new ArrayList<Profile>();
+    private final List<Groups> mGroups = new ArrayList<Groups>();
+    private final OnClickListener mOnClickListener;
 
 
     public NewsViewHolder(@NonNull final View itemView, final LayoutInflater pLayoutInflater,
@@ -81,7 +79,7 @@ public class NewsViewHolder extends RecyclerView.ViewHolder implements SetLikeOb
     }
 
 
-    void onBind(Item pItem, Context pContext) {
+    public void onBind(final Item pItem, final Context pContext, final IMainView pIMainView) {
         mItem = pItem;
         final Groups groups = getGroup(mItem);
         final Profile profile = getProfile(mItem);
@@ -126,7 +124,11 @@ public class NewsViewHolder extends RecyclerView.ViewHolder implements SetLikeOb
             @Override
             public void onClick(final View v) {
                 if (mItem.getLikes().getCanLike() == 1 && mItem.getLikes().getUserLike() == 0) {
-                    mItemId = mItem.getPostId();
+                    Item item = pItem;
+                    item.getLikes().setUserLike(1);
+                    item.getLikes().setCanLike(0);
+                    pIMainView.clickLikeOnItem(item);
+                    mLikeText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.read_heart, 0, 0, 0);
                 }
             }
         });
@@ -242,49 +244,4 @@ public class NewsViewHolder extends RecyclerView.ViewHolder implements SetLikeOb
         return null;
     }
 
-    @Override
-    public void addLike(final Response message) {
-/*
-        final List<Item> items = new ArrayList<Item>(mItems);
-        Item concreteItem = null;
-        for (final Item item : items) {
-            if (item.getPostId() == mItemId) {
-                concreteItem = item;
-            }
-        }
-
-        final Likes likes = concreteItem.getLikes();
-
-        likes.setCountLike(message.getResponseNews().likes);
-        likes.setUserLike(1);
-        likes.setCanLike(0);
-        concreteItem.setLikes(likes);
-        items.add(concreteItem);
-        mItems.clear();
-        mItems.addAll(items);
-
-    }*/
-
-
-       /* public void setItems ( final Response pResponseNews){
-            final List<Item> items = pResponseNews.getResponseNews().getItemList();
-            final List<Groups> groups = pResponseNews.getResponseNews().getGroupsList();
-            final List<Profile> profiles = pResponseNews.getResponseNews().getProfileList();
-
-            mItems.clear();
-            mItems.addAll(items);
-            mGroups.addAll(groups);
-            mProfiles.addAll(profiles);
-
-        }
-
-        private void add ( final Item pItem){
-            mItems.add(pItem);
-        }
-
-        public void udateList ( final List<Item> items){
-
-
-        }*/
-    }
 }

@@ -5,12 +5,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.github.vasiliz.vkclient.base.db.config.Field;
+import com.github.vasiliz.vkclient.base.db.config.Id;
 import com.github.vasiliz.vkclient.base.db.config.Table;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.google.gson.annotations.SerializedName;
 
 @Table
 public class Attachment implements Parcelable {
+
+    @Id
+    private int mHash;
 
     @Field
     private long idAttachment;
@@ -106,8 +110,9 @@ public class Attachment implements Parcelable {
         }
     };
 
-    public ContentValues getContentValues(final long pIdAttachment) {
+    public ContentValues getContentValues(final long pIdAttachment, final long identifier) {
         final ContentValues contentValues = new ContentValues();
+        contentValues.put("mHash", identifier);
         contentValues.put(ConstantStrings.DB.AttathmentTable.ID_ATTACHMENT, pIdAttachment);
         contentValues.put(ConstantStrings.DB.AttathmentTable.TYPE_ATTACHMENT, mTypeAttachments);
         if (mTypeAttachments.contains(ConstantStrings.TypesAttachment.AUDIO)) {
@@ -144,12 +149,12 @@ public class Attachment implements Parcelable {
     @Override
     public int hashCode() {
         int result = (int) (idAttachment ^ (idAttachment >>> 32));
-        result = 31 * result + (mTypeAttachments != null ? mTypeAttachments.hashCode() : 0);
-        result = 31 * result + (mPhoto != null ? mPhoto.hashCode() : 0);
-        result = 31 * result + (mAudio != null ? mAudio.hashCode() : 0);
-        result = 31 * result + (mVideo != null ? mVideo.hashCode() : 0);
-        result = 31 * result + (mDoc != null ? mDoc.hashCode() : 0);
-        result = 31 * result + (mLink != null ? mLink.hashCode() : 0);
+        result += 31 * result + (mTypeAttachments != null ? mTypeAttachments.hashCode() : 0);
+        result += 31 * result + (mPhoto != null ? mPhoto.hashCode() : 0);
+        result += 31 * result + (mAudio != null ? mAudio.hashCode() : 0);
+        result += 31 * result + (mVideo != null ? mVideo.hashCode() : 0);
+        result += 31 * result + (mDoc != null ? mDoc.hashCode() : 0);
+        result += 31 * result + (mLink != null ? mLink.hashCode() : 0);
         return result;
     }
 }

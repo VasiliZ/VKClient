@@ -302,10 +302,12 @@ public class AttachmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             if (mAttachments.get(ConstantStrings.TypesAttachment.PHOTO) == null) {
                 ViewUtils.setVisible(mImageLink);
                 mImageLink.setAdjustViewBounds(true);
-                ImageLoader.getInstance()
-                        .with(mLayoutInflater.getContext())
-                        .load(SetImageUtils.checkAttachmentImage(link.getPhoto()))
-                        .into(mImageLink);
+                if (link.getPhoto() != null) {
+                    ImageLoader.getInstance()
+                            .with(mLayoutInflater.getContext())
+                            .load(SetImageUtils.checkAttachmentImage(link.getPhoto()))
+                            .into(mImageLink);
+                }
             } else {
                 ViewUtils.setVisibilityGone(mImageLink);
             }

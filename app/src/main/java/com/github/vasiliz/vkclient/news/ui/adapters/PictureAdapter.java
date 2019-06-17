@@ -39,10 +39,12 @@ public class PictureAdapter extends RecyclerView.Adapter<PictureAdapter.PictureH
     public void onBindViewHolder(@NonNull final PictureAdapter.PictureHolder pViewHolder, final int pI) {
 
         final Photo photo = mPhotos.get(pI);
-        ImageLoader.getInstance()
-                .with(mLayoutInflater.getContext())
-                .load(SetImageUtils.checkAttachmentImage(photo))
-                .into(pViewHolder.mImageView);
+        if (photo != null) {
+            ImageLoader.getInstance()
+                    .with(mLayoutInflater.getContext())
+                    .load(SetImageUtils.checkAttachmentImage(photo))
+                    .into(pViewHolder.mImageView);
+        }
     }
 
     @Override

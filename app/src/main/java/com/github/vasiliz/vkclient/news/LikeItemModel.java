@@ -1,7 +1,8 @@
 package com.github.vasiliz.vkclient.news;
 
 import com.github.vasiliz.vkclient.VkApplication;
-import com.github.vasiliz.vkclient.base.services.IAbstractActionTask;
+import com.github.vasiliz.vkclient.base.db.config.AppDB;
+import com.github.vasiliz.vkclient.base.services.IAbstractTask;
 import com.github.vasiliz.vkclient.base.services.IDataExecutorService;
 import com.github.vasiliz.vkclient.base.streams.HttpInputStreamProvider;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
@@ -9,8 +10,7 @@ import com.github.vasiliz.vkclient.base.utils.IOUtils;
 import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.observer.LikeObservable;
-import com.github.vasiliz.vkclient.news.observer.SetLikeObserver;
-import com.github.vasiliz.vkclient.news.ui.Result;
+import com.github.vasiliz.vkclient.news.observer.LikeObserver;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -19,24 +19,28 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-
-public class SetLike extends IAbstractActionTask<Response, Result> implements LikeObservable<Response> {
-    private final Item mItem;
+class LikeItemModel extends IAbstractTask<Item, Response> implements LikeObservable {
     private final String mAccessToken;
-    private final String TAG = "TAGAGA";
-    private final NewsModel mNewsModel;
-    private final Collection<SetLikeObserver> mObservers = new ArrayList<SetLikeObserver>();
+
+    private final Collection<LikeObserver> mObservers = new ArrayList<LikeObserver>();
+    private final Item mItem;
+    private final AppDB mAppDB = AppDB.getAppDBInstance();
 
 
-    SetLike(final String pAccessToken, final Item pItem, final NewsModel pNewsModel, final IDataExecutorService pExecutorDataService) {
-        super(pExecutorDataService);
+    public LikeItemModel(final IDataExecutorService pIDataExecutorService, final String pAccessToken, final Item pItem) {
+        super(pIDataExecutorService);
         mAccessToken = pAccessToken;
         mItem = pItem;
-        mNewsModel = pNewsModel;
+
     }
 
     @Override
-    public Response executeNetwork() {
+    public Response executeLocal() {
+        return mAppDB.getSaveData();
+    }
+
+    @Override
+    public Response executeNetwork(final boolean isLoadMore) {
         InputStream inputStream = null;
         ByteArrayOutputStream byteArrayOutputStream = null;
         final String templateApi = VkApplication.getmDoLike().getTamplateApiString();
@@ -56,8 +60,9 @@ public class SetLike extends IAbstractActionTask<Response, Result> implements Li
                 byteArrayOutputStream.write(res);
                 res = inputStream.read();
             }
+
             if (byteArrayOutputStream.toString().contains(ConstantStrings.ApiVK.ERROR)) {
-                mNewsModel.errorDoLike();
+                //todo handle error
             }
         } catch (final Exception pE) {
             pE.fillInStackTrace();
@@ -67,7 +72,6 @@ public class SetLike extends IAbstractActionTask<Response, Result> implements Li
         return jsonToObject(byteArrayOutputStream != null ? byteArrayOutputStream.toString() : null);
     }
 
-
     @Override
     public void postExecute(final Response pResponse) {
         if (pResponse != null) {
@@ -75,30 +79,52 @@ public class SetLike extends IAbstractActionTask<Response, Result> implements Li
         }
     }
 
+    @Override
+    public void postDataBaseExecute(final Response pResponse) {
+        if (pResponse.getResponseNews() != null) {
+            notifyAfterDBTask(pResponse);
+        }
+    }
+
+
     private Response jsonToObject(final String pJson) {
         final Gson gson = new GsonBuilder().create();
         return gson.fromJson(pJson, Response.class);
 
     }
 
-
     @Override
-    public void registerObserver(final SetLikeObserver pObserver) {
+    public void registerObserver(final LikeObserver pObserver) {
         mObservers.add(pObserver);
     }
 
     @Override
-    public void notifyObservers(final Response message) {
-        for (final SetLikeObserver setLikeObserver : mObservers) {
-            merge(message);
-            setLikeObserver.addLike(message);
+    public void notifyObservers(final Response pResponse) {
+        for (final LikeObserver likeObserver : mObservers) {
+            likeObserver.notifyAfterLikedItem();
         }
     }
 
     @Override
-    public Result merge(Response pResponse) {
-     /*  Result result = new Result();
-       result.*/
-        return null;
+    public void notifyAfterDBTask(final Response pResponse) {
+        for (final LikeObserver observer : mObservers) {
+            observer.notifyAfterComplitedDatabaseTask(pResponse);
+        }
     }
+
+    @Override
+    public Item merge(final Response pResponse) {
+        final Item item = mItem;
+        item.getLikes().setCanLike(0);
+        item.getLikes().setUserLike(1);
+        item.getLikes().setCountLike(pResponse.getResponseNews().likes);
+        return item;
+    }
+
+    @Override
+    public void saveToCache(final Response pData) {
+        mAppDB.updateItem(merge(pData));
+    }
+
+
 }

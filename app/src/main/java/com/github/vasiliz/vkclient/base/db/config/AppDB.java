@@ -1,6 +1,7 @@
 package com.github.vasiliz.vkclient.base.db.config;
 
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -28,6 +29,7 @@ import com.github.vasiliz.vkclient.news.entity.VideoDocPreview;
 import com.github.vasiliz.vkclient.news.entity.Views;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -96,21 +98,23 @@ public final class AppDB {
 
     public void writeData(final Response pResponse) {
         final SQLiteDatabase database = mDBHelper.getWritableDatabase();
+
         try {
             database.beginTransaction();
+            database.disableWriteAheadLogging();
             final List<Groups> groups = pResponse.getResponseNews().getGroupsList();
             final List<Profile> profiles = pResponse.getResponseNews().getProfileList();
             final List<Item> items = pResponse.getResponseNews().getItemList();
             insertGroups(groups, database);
             insertProfiles(profiles, database);
-            insertItems(items, database);
-            database.setTransactionSuccessful();
+            insertItems(items);
+
         } catch (final Exception e) {
             e.fillInStackTrace();
             //   Log.d(TAG, "ErrorRequest while trying read data to db");
         } finally {
+            database.setTransactionSuccessful();
             database.endTransaction();
-            database.close();
         }
 
     }
@@ -146,32 +150,49 @@ public final class AppDB {
         }
     }
 
-    private void insertItems(final List<Item> pItems, final SQLiteDatabase pSQLiteDatabase) {
-        for (int i = 0; i < pItems.size(); i++) {
-            final Item item = pItems.get(i);
-            pSQLiteDatabase
-                    .insertWithOnConflict(
-                            Item.class.getSimpleName(),
-                            null,
-                            item.getContentValues(),
-                            SQLiteDatabase.CONFLICT_REPLACE);
-
-            insertAttachment(item, pSQLiteDatabase);
-            insertLike(item, pSQLiteDatabase);
-            insertComments(item, pSQLiteDatabase);
-            insertReposts(item, pSQLiteDatabase);
-            insertViews(item, pSQLiteDatabase);
+    private void insertItems(final List<Item> pItems) {
+        final SQLiteDatabase sqLiteDatabase = mDBHelper.getWritableDatabase();
+        try {
+            sqLiteDatabase.beginTransaction();
+            for (int i = 0; i < pItems.size(); i++) {
+                final Item item = pItems.get(i);
+                insertItem(item, sqLiteDatabase);
+            }
+            sqLiteDatabase.setTransactionSuccessful();
+        } catch (final Exception pE) {
+            pE.fillInStackTrace();
+        } finally {
+            sqLiteDatabase.endTransaction();
         }
+
+    }
+
+    private void insertItem(final Item pItem, final SQLiteDatabase pSQLiteDatabase) {
+
+        pSQLiteDatabase
+                .insertWithOnConflict(
+                        Item.class.getSimpleName(),
+                        null,
+                        pItem.getContentValues(),
+                        SQLiteDatabase.CONFLICT_REPLACE);
+
+        insertAttachment(pItem, pSQLiteDatabase);
+        insertLike(pItem, pSQLiteDatabase);
+        insertComments(pItem, pSQLiteDatabase);
+        insertReposts(pItem, pSQLiteDatabase);
+        insertViews(pItem, pSQLiteDatabase);
     }
 
     private void insertViews(final Item pItem, final SQLiteDatabase pSQLiteDatabase) {
-        pSQLiteDatabase
-                .insertWithOnConflict(
-                        Views.class.getSimpleName(),
-                        null,
-                        pItem.getViews()
-                                .getContentValues(pItem.getPostId()),
-                        SQLiteDatabase.CONFLICT_REPLACE);
+        if (pItem.getViews() != null) {
+            pSQLiteDatabase
+                    .insertWithOnConflict(
+                            Views.class.getSimpleName(),
+                            null,
+                            pItem.getViews()
+                                    .getContentValues(pItem.getPostId()),
+                            SQLiteDatabase.CONFLICT_REPLACE);
+        }
     }
 
     private void insertReposts(final Item pItem, final SQLiteDatabase pSQLiteDatabase) {
@@ -210,8 +231,8 @@ public final class AppDB {
                             .insertWithOnConflict(
                                     Attachment.class.getSimpleName(),
                                     null,
-                                    attachment.getContentValues(pItem.getPostId()),
-                                    SQLiteDatabase.CONFLICT_REPLACE);
+                                    attachment.getContentValues(pItem.getPostId(), pItem.getDate()+pItem.getPostId()+i),
+                                    SQLiteDatabase.CONFLICT_IGNORE);
                     if (attachment.getAudio() != null) {
                         insertAudio(attachment, pSQLiteDatabase);
                     } else if (attachment.getVideo() != null) {
@@ -317,7 +338,7 @@ public final class AppDB {
                                 .getPhoto()
                                 .getContentValues(pAttachment
                                         .hashCode()),
-                        SQLiteDatabase.CONFLICT_REPLACE);
+                        SQLiteDatabase.CONFLICT_IGNORE);
     }
 
     private void insertVideo(final Attachment pAttachment, final SQLiteDatabase pSQLiteDatabase) {
@@ -418,9 +439,15 @@ public final class AppDB {
     private List<Item> getAllItems() {
         Cursor cursor = null;
         final SQLiteDatabase readable = mDBHelper.getReadableDatabase();
+        readable.beginTransaction();
         final List<Item> items = new ArrayList<Item>();
         try {
-            final String sql = SELECT_DISTINCT + SPACE + Item.class.getSimpleName() +
+            final String sql = "Select distinct" +
+                    " * " +
+
+                    " from Item " +
+                    " order by Item.mAddedAt desc limit 50;";
+                    /*SELECT_DISTINCT + SPACE + Item.class.getSimpleName() +
                     DOT + ConstantStrings.DB.ItemTable.ADDED_AT +
                     this.COMMA + ConstantStrings.DB.ItemTable.ATTACHMENTS +
                     this.COMMA + ConstantStrings.DB.ItemTable.COMMENTS +
@@ -462,49 +489,47 @@ public final class AppDB {
                     Views.class.getSimpleName() + DOT + ConstantStrings.DB.ViewsTable.ID + EQUALLY
                     + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
                     + ORDER_BY + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.ADDED_AT
-                    + DESC + " limit " + mItemslinit + " , 50" + END_QUERY;
+                    + DESC + " limit 50" + END_QUERY;*/
             cursor = readable.rawQuery(sql, null);
+            Log.d(TAG, "getAllItems: " + sql);
 
-            items.addAll(readDataFromCursor(cursor));
-
+            items.addAll(readDataFromCursor(cursor, readable));
+            readable.setTransactionSuccessful();
+        } catch (final Exception pE) {
+            pE.fillInStackTrace();
         } finally {
-
+            readable.endTransaction();
             CursorUtils.closeCursor(cursor);
-            readable.close();
         }
         if (items.isEmpty()) {
             return null;
         }
-        mItemslinit += 51;
+        Collections.reverse(items);
         return items;
     }
 
-    private List<Item> readDataFromCursor(final Cursor pCursor) {
+    private List<Item> readDataFromCursor(final Cursor pCursor, final SQLiteDatabase pSQLiteDatabase) {
         final List<Item> items = new ArrayList<Item>();
         Item item;
         if (pCursor.moveToFirst()) {
             do {
 
-                item = new Item(pCursor.getString(7),//type
-                        pCursor.getInt(3),//source_id
-                        pCursor.getLong(4),//date
-                        pCursor.getInt(6),//post id
-                        pCursor.getString(7),//post type
+                item = new Item(pCursor.getString(6),//type
+                        pCursor.getInt(8),//source_id
+                        pCursor.getLong(3),//date
+                        pCursor.getInt(5),//post id
+                        pCursor.getString(10),//post type
                         pCursor.getString(9),//text
                         //attachments
-                        getAttachments(pCursor.getInt(6)),
+                        getAttachments(pCursor.getInt(1), pSQLiteDatabase),
                         //comments
-                        new Comments(pCursor.getLong(13),
-                                pCursor.getInt(12)),
+                        getComments(pCursor.getLong(2), pSQLiteDatabase),
                         //setLikes
-                        new Likes(pCursor.getInt(15),
-                                pCursor.getInt(16),
-                                pCursor.getInt(14)),
+                        getLikes(pCursor.getInt(4), pSQLiteDatabase),
                         //setReposts
-                        new Reposts(pCursor.getLong(17),
-                                pCursor.getInt(18)),
+                        getReposts(pCursor.getLong(7), pSQLiteDatabase),
                         //setViews
-                        new Views(pCursor.getLong(19)),
+                        getViews(pCursor.getLong(11), pSQLiteDatabase),
                         pCursor.getLong(0)//addedAt
                 );
                 items.add(item);
@@ -515,14 +540,115 @@ public final class AppDB {
         return items;
     }
 
-    private List<Attachment> getAttachments(final int pIdAttachments) {
+    private Views getViews(final long pLong, final SQLiteDatabase pSQLiteDatabase) {
+        Views views = null;
+        Cursor cursor = null;
+        try {
+            cursor = pSQLiteDatabase
+                    .rawQuery(String
+                                    .format(
+                                            Locale.ENGLISH,
+                                            "Select * from Views where Views.mIdViews = %d",
+                                            pLong),
+                            null);
+            if (cursor.moveToFirst()) {
+                do {
+                    views = new Views(cursor.getLong(0));
+                } while (cursor.moveToNext());
+            }
+        } catch (final SQLException pE) {
+            pE.fillInStackTrace();
+        } finally {
+            CursorUtils.closeCursor(cursor);
+        }
+        return views;
+    }
+
+    private Reposts getReposts(final long pLong, final SQLiteDatabase pSQLiteDatabase) {
+        Reposts reposts = null;
+
+        Cursor cursor = null;
+        try {
+            cursor = pSQLiteDatabase
+                    .rawQuery(String
+                                    .format(
+                                            Locale.ENGLISH,
+                                            "Select * from Reposts where Reposts.mRepostId = %d",
+                                            pLong),
+                            null);
+            if (cursor.moveToFirst()) {
+                do {
+                    reposts = new Reposts(cursor.getLong(0),
+                            cursor.getInt(2));
+                } while (cursor.moveToNext());
+            }
+        } catch (final SQLException pE) {
+            pE.fillInStackTrace();
+        } finally {
+            CursorUtils.closeCursor(cursor);
+        }
+        return reposts;
+    }
+
+    private Likes getLikes(final int pInt, final SQLiteDatabase pSQLiteDatabase) {
+        Likes likes = null;
+        Cursor cursor = null;
+        try {
+            cursor = pSQLiteDatabase
+                    .rawQuery(String
+                                    .format(
+                                            Locale.ENGLISH,
+                                            "select * from  Likes where Likes.mIdLike= %d order by Likes.mCountLike desc limit 1",
+                                            pInt),
+                            null);
+            Log.d(TAG, "getLikes: " + pInt);
+            if (cursor.moveToFirst()) {
+                do {
+                    likes = new Likes(cursor.getLong(1),
+                            cursor.getInt(3),
+                            cursor.getInt(0));
+                } while (cursor.moveToNext());
+            }
+        } catch (final SQLException pE) {
+            pE.fillInStackTrace();
+        } finally {
+            CursorUtils.closeCursor(cursor);
+        }
+        return likes;
+    }
+
+    private Comments getComments(final long pLong, final SQLiteDatabase pSQLiteDatabase) {
+        Comments comments = null;
+        Cursor cursor = null;
+        try {
+            cursor = pSQLiteDatabase
+                    .rawQuery(String
+                                    .format(
+                                            Locale.ENGLISH,
+                                            "Select * from Comments where Comments.mCommentsId = %d",
+                                            pLong),
+                            null);
+            if (cursor.moveToFirst()) {
+                do {
+                    comments = new Comments(cursor.getLong(2),
+                            cursor.getInt(0));
+                } while (cursor.moveToNext());
+            }
+        } catch (final SQLException pE) {
+            pE.fillInStackTrace();
+        } finally {
+            CursorUtils.closeCursor(cursor);
+        }
+        return comments;
+    }
+
+    private List<Attachment> getAttachments(final int pIdAttachments, final SQLiteDatabase pSQLiteDatabase) {
         final List<Attachment> listAttachment = new ArrayList<Attachment>();
-        final SQLiteDatabase sqLiteDatabase = mDBHelper.getReadableDatabase();
         Cursor cursor = null;
         try {
 
-            Log.d(TAG, "getAttachments: " + String.format(ConstantStrings.DB.Queryes.SELECT_ATTACHMENTS, pIdAttachments));
-            cursor = sqLiteDatabase
+            //  Log.d(TAG, "getAttachments: " + String.format(ConstantStrings.DB.Queryes.SELECT_ATTACHMENTS, pIdAttachments));
+            cursor = pSQLiteDatabase
                     .rawQuery(String
                                     .format(Locale.ENGLISH,
                                             ConstantStrings.DB.Queryes.SELECT_ATTACHMENTS,
@@ -543,6 +669,7 @@ public final class AppDB {
             } else {
                 return null;
             }
+
         } catch (final Exception pE) {
             pE.fillInStackTrace();
         } finally {
@@ -570,11 +697,11 @@ public final class AppDB {
     private Photo getPhotoLink(final long pLong) {
 
         final SQLiteDatabase sqLiteDatabase = mDBHelper.getReadableDatabase();
-        final String sql = "select Photo.* from Photo, Link " +
+        final String sql = "select Photo.* from Photo " +
                 " where " + pLong + EQUALLY + "Photo.idPhoto;";
         final Cursor cursor = sqLiteDatabase.rawQuery(sql, null);
         Photo photo = null;
-        Log.d(TAG, "getPhotoLink: " + sql);
+        //  Log.d(TAG, "getPhotoLink: " + sql);
 
         try {
             if (cursor.moveToFirst()) {
@@ -593,7 +720,7 @@ public final class AppDB {
                             cursor.getString(1));
                 } while (cursor.moveToNext());
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.fillInStackTrace();
         } finally {
             CursorUtils.closeCursor(cursor);
@@ -665,4 +792,26 @@ public final class AppDB {
         return photo;
     }
 
+    public void updateItem(final Item pItem) {
+        final SQLiteDatabase database = mDBHelper.getWritableDatabase();
+
+        try {
+
+            database
+                    .updateWithOnConflict(
+                            Item.class.getSimpleName(),
+                            pItem.updateItem(), null, null, SQLiteDatabase.CONFLICT_IGNORE);
+
+            insertAttachment(pItem, database);
+            insertLike(pItem, database);
+            insertComments(pItem, database);
+            insertReposts(pItem, database);
+            insertViews(pItem, database);
+
+        } catch (final Exception pE) {
+            pE.fillInStackTrace();
+        }
+
+
+    }
 }

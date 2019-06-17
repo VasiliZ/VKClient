@@ -8,12 +8,10 @@ import com.github.vasiliz.vkclient.base.services.IDataExecutorService;
 import com.github.vasiliz.vkclient.base.streams.HttpInputStreamProvider;
 import com.github.vasiliz.vkclient.base.utils.ConstantStrings;
 import com.github.vasiliz.vkclient.base.utils.IOUtils;
-import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Response;
 import com.github.vasiliz.vkclient.news.observer.Observable;
 import com.github.vasiliz.vkclient.news.observer.Observer;
 import com.github.vasiliz.vkclient.news.ui.INewsModel;
-import com.github.vasiliz.vkclient.news.ui.adapters.NewsViewHolder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -23,7 +21,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class NewsModel extends IAbstractTask<Response> implements Observable<Response>, INewsModel {
+public class NewsModel extends IAbstractTask<Object, Response> implements Observable<Response>, INewsModel {
 
     private final Collection<Observer> mObservers = new ArrayList<Observer>();
 
@@ -32,8 +30,6 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
     private final String mAccessToken;
     private String mNextFromNews;
     private Response mResponse;
-    private final IDataExecutorService mIDataExecutorService;
-    private NewsViewHolder mNewsAdapter;
 
     private final IMainPresenter mIMainPresenter;
 
@@ -45,7 +41,6 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
         super(pIDataExecutorService);
         mIMainPresenter = pMainPresenter;
         mAccessToken = pAccessToken;
-        mIDataExecutorService = pIDataExecutorService;
     }
 
     @Override
@@ -53,10 +48,7 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
         return mAppDB.getSaveData();
     }
 
-    @Override
-    public Response executeNetwork() {
-        return null;
-    }
+
 
     @SuppressWarnings("BooleanParameter")
     @Override
@@ -105,6 +97,11 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
     }
 
     @Override
+    public Object merge(Response pResponse) {
+        return null;
+    }
+
+    @Override
     public void saveToCache(final Response data) {
 
         mAppDB.writeData(data);
@@ -115,6 +112,11 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
         if (pResponse != null) {
             notifyObservers(pResponse);
         }
+    }
+
+    @Override
+    public void postDataBaseExecute(Response pResponse) {
+        notifyObservers(pResponse);
     }
 
     @Override
@@ -143,22 +145,8 @@ public class NewsModel extends IAbstractTask<Response> implements Observable<Res
         mResponse = pResponse;
     }
 
-
-    @Override
-    public void doLike(final Item pItem) {
-        final SetLike setLike = new SetLike(mAccessToken, pItem, this, mIDataExecutorService);
-        setLike.registerObserver(mNewsAdapter);
-        mIDataExecutorService.doNetworkTask(setLike);
-    }
-
     @Override
     public void errorDoLike() {
         mIMainPresenter.showToast();
     }
-
-    public void registerLikeOnserver(final NewsViewHolder pNewsViewHolder) {
-        mNewsAdapter = pNewsViewHolder;
-    }
-
-
 }

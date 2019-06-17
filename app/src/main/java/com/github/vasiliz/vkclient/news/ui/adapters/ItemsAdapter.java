@@ -12,6 +12,8 @@ import com.github.vasiliz.vkclient.R;
 import com.github.vasiliz.vkclient.news.entity.Groups;
 import com.github.vasiliz.vkclient.news.entity.Item;
 import com.github.vasiliz.vkclient.news.entity.Profile;
+import com.github.vasiliz.vkclient.news.ui.IMainView;
+import com.github.vasiliz.vkclient.news.ui.adapters.holders.NewsViewHolder;
 import com.github.vasiliz.vkclient.news.ui.listeners.OnClickListener;
 
 import java.util.ArrayList;
@@ -24,16 +26,18 @@ public class ItemsAdapter extends ListAdapter<Item, NewsViewHolder> {
     private final List<Groups> mGroups;
     private final List<Profile> mProfiles;
     private final OnClickListener mOnClickListener;
-  //  private final String TAG = NewsAdapter.class.getSimpleName();
 
-    public ItemsAdapter(final Context pContext, final OnClickListener pOnClickListener) {
+    private final IMainView mIMainView;
+    //  private final String TAG = NewsAdapter.class.getSimpleName();
+
+    public ItemsAdapter(final Context pContext, final OnClickListener pOnClickListener, final IMainView pIMainView) {
         super(Item.DIFF_CALLBACK);
-
         mLayoutInflater = LayoutInflater.from(pContext);
         mItems = new ArrayList<Item>();
         mGroups = new ArrayList<Groups>();
         mProfiles = new ArrayList<Profile>();
         mOnClickListener = pOnClickListener;
+        mIMainView = pIMainView;
     }
 
     @NonNull
@@ -45,7 +49,7 @@ public class ItemsAdapter extends ListAdapter<Item, NewsViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull final NewsViewHolder pNewsAdapter, final int pI) {
-        pNewsAdapter.onBind(mItems.get(pI), mLayoutInflater.getContext());
+        pNewsAdapter.onBind(mItems.get(pI), mLayoutInflater.getContext(), mIMainView);
     }
 
     public void submitOtherInfo(final Collection<Profile> pProfileList, final Collection<Groups> pGroupsList) {
@@ -58,12 +62,13 @@ public class ItemsAdapter extends ListAdapter<Item, NewsViewHolder> {
         return mItems.size();
     }
 
-    @Override
+
     public void submitList(@Nullable final List<Item> list) {
         if (list != null) {
             mItems.clear();
             mItems.addAll(list);
         }
     }
+
 }
 

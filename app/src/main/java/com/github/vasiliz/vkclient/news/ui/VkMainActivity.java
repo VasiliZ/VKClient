@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.github.vasiliz.vkclient.R;
@@ -35,11 +36,11 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
 
     private MainPresenterImpl mIMainPresenter;
     private RecyclerView mRecyclerView;
-    private NewsAdapter mNewsAdapter;
     private boolean isLastPage;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private boolean isLoading;
     private ItemsAdapter mItemsAdapter;
+    private String TAG = VkMainActivity.class.getSimpleName();
 
     @Override
     public void onRefresh() {
@@ -58,18 +59,7 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
         toolbar.setTitleTextColor(Color.WHITE);
         toolbar.setTitle(R.string.news_toolbar_title);
         setSupportActionBar(toolbar);
-       /* ListAdapter listAdapter = new ListAdapter() {
-            @NonNull
-            @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup pViewGroup, int pI) {
-                return null;
-            }
 
-            @Override
-            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder pViewHolder, int pI) {
-
-            }
-        };*/
         mRecyclerView = findViewById(R.id.news_recycler_view);
         mSwipeRefreshLayout = findViewById(R.id.swipe_to_refresh);
         initRecyclerView();
@@ -104,7 +94,7 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
-        });
+        }, this);
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
@@ -172,6 +162,12 @@ public class VkMainActivity extends VkActivity implements IMainView, SwipeRefres
                 pMessage.getResponseNews().getGroupsList());
         mItemsAdapter.submitList(pMessage.getResponseNews().getItemList());
         mItemsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void clickLikeOnItem(final Item pItem) {
+        Log.d(TAG, "clickLikeOnItem: " + pItem.getPostId());
+        mIMainPresenter.doLike(pItem);
     }
 
     @Override

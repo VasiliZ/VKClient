@@ -1,7 +1,11 @@
 package com.github.vasiliz.vkclient.news.observer;
 
-public interface LikeObservable<T> {
+import com.github.vasiliz.vkclient.news.entity.Response;
 
-    void registerObserver(SetLikeObserver pObserver);
-    void notifyObservers(T message);
+public interface LikeObservable {
+
+    void registerObserver(LikeObserver pObserver);
+    void notifyObservers(Response pT);
+
+    void notifyAfterDBTask(Response pResponse);
 }

@@ -35,15 +35,17 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieHolder>
 
     @Override
     public void onBindViewHolder(@NonNull final MovieAdapter.MovieHolder viewHolder, final int pPosition) {
-        final Video video = mVideoList.get(pPosition);
 
-        final int videoDuration = video.getDurationVideo();
-        viewHolder.mVideoDuration.setText(calculateTime(videoDuration));
-        viewHolder.mTitleVideo.setText(video.getTitleVideo());
-        ImageLoader.getInstance()
-                .with(mLayoutInflater.getContext())
-                .load(video.getUrlPhotoVideo())
-                .into(viewHolder.mImageView);
+        final Video video = mVideoList.get(pPosition);
+        if (video != null) {
+            final int videoDuration = video.getDurationVideo();
+            viewHolder.mVideoDuration.setText(calculateTime(videoDuration));
+            viewHolder.mTitleVideo.setText(video.getTitleVideo());
+            ImageLoader.getInstance()
+                    .with(mLayoutInflater.getContext())
+                    .load(video.getUrlPhotoVideo())
+                    .into(viewHolder.mImageView);
+        }
     }
 
     private String calculateTime(final int pDurationInSeconds) {
