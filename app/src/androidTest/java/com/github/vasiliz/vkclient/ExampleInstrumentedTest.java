@@ -27,23 +27,24 @@ public class ExampleInstrumentedTest {
 
     @Before
     public void initTest(){
-        VkApplication vkApplication = new VkApplication();
+        final VkApplication vkApplication = new VkApplication();
         vkApplication.onCreate();
         mExecutorDataService = ExecutorDataServiceImpl.getInstance();
-        mNewsModel = new NewsModel(mExecutorDataService);
+       // mNewsModel = new NewsModel(mExecutorDataService);
     }
 
     @Test
     public void getNetworkData() {
 
-        Response response = mNewsModel.executeNetwork(false);
+        final Response response = mNewsModel.executeNetwork(false);
         assertNotNull(response);
         assertEquals(response.getResponseNews().getItemList().size(), 50);
     }
 
     @Test
     public void GetLocalData(){
-        Response response = mNewsModel.executeLocal();
+
+        final Response response = mNewsModel.executeLocal();
         assertNotNull(response);
         assertEquals(response.getResponseNews().getItemList().size(), 49);
     }

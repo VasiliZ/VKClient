@@ -57,25 +57,8 @@ public final class AppDB {
     private static AppDB INSTANCE;
     private final DBHelper mDBHelper;
     private final String TAG = AppDB.class.getSimpleName();
-    private final String SELECT_FROM = "Select * from ";
-    private final String LIMIT = " LIMIT ";
-    private final String SELECT_DISTINCT = "Select distinct ";
-    private final String DOT = ".";
-    private final String COMMA = ", ";
-    private final String SPACE = " ";
-    private final String FROM = " from ";
-    private final String INNER_JOIN = " inner join ";
-    private final String ON = " on ";
-    private final String OPEN_BRACKET = "(";
-    private final String CLOSE_BRACKET = ")";
+
     private final String EQUALLY = " = ";
-    private final String ORDER_BY = " order by ";
-    private final String DESC = " desc";
-    private final String END_QUERY = " ;";
-    private final String LEFT_JOIN = " left join ";
-    private final String PHOTO = " photo";
-    private String WHERE = " Where ";
-    private int mItemslinit = 0;
 
     private AppDB() {
         mDBHelper = VkApplication.getDBHelper();
@@ -231,7 +214,7 @@ public final class AppDB {
                             .insertWithOnConflict(
                                     Attachment.class.getSimpleName(),
                                     null,
-                                    attachment.getContentValues(pItem.getPostId(), pItem.getDate()+pItem.getPostId()+i),
+                                    attachment.getContentValues(pItem.getPostId(), pItem.getDate() + pItem.getPostId() + i),
                                     SQLiteDatabase.CONFLICT_IGNORE);
                     if (attachment.getAudio() != null) {
                         insertAudio(attachment, pSQLiteDatabase);
@@ -373,24 +356,20 @@ public final class AppDB {
         return response;
     }
 
-    private Cursor getCursorForSelectAllData(final Class pClass, final int pLimit) {
-        final StringBuilder selectBuilder = new StringBuilder();
-        selectBuilder
-                .append(SELECT_FROM)
-                .append(pClass.getSimpleName());
+    private Cursor getCursorForSelectAllData(final Class pClass) {
+        final String SELECT_FROM = "Select * from ";
         final SQLiteDatabase database = mDBHelper.getReadableDatabase();
-        if (pLimit != 0) {
-            selectBuilder.append(" order by id desc ");
-            selectBuilder.append(LIMIT).append(pLimit);
-        }
 
-        return database.rawQuery(selectBuilder.toString(), null);
+
+        final String select = SELECT_FROM +
+                pClass.getSimpleName();
+        return database.rawQuery(select, null);
     }
 
     private List<Groups> getAllGroups() {
 
         final List<Groups> groups = new ArrayList<Groups>();
-        final Cursor cursor = getCursorForSelectAllData(Groups.class, 0);
+        final Cursor cursor = getCursorForSelectAllData(Groups.class);
         try {
             if (cursor.moveToFirst()) {
                 do {
@@ -413,7 +392,7 @@ public final class AppDB {
     }
 
     private List<Profile> getAllProfiles() {
-        final Cursor cursor = getCursorForSelectAllData(Profile.class, 0);
+        final Cursor cursor = getCursorForSelectAllData(Profile.class);
         final List<Profile> profiles = new ArrayList<Profile>();
         try {
             if (cursor.moveToFirst()) {
@@ -444,52 +423,9 @@ public final class AppDB {
         try {
             final String sql = "Select distinct" +
                     " * " +
-
                     " from Item " +
                     " order by Item.mAddedAt desc limit 50;";
-                    /*SELECT_DISTINCT + SPACE + Item.class.getSimpleName() +
-                    DOT + ConstantStrings.DB.ItemTable.ADDED_AT +
-                    this.COMMA + ConstantStrings.DB.ItemTable.ATTACHMENTS +
-                    this.COMMA + ConstantStrings.DB.ItemTable.COMMENTS +
-                    this.COMMA + ConstantStrings.DB.ItemTable.SOURCE_ID +
-                    this.COMMA + ConstantStrings.DB.ItemTable.DATE +
-                    this.COMMA + ConstantStrings.DB.ItemTable.LIKES +
-                    this.COMMA + ConstantStrings.DB.ItemTable.POST_ID +
-                    this.COMMA + ConstantStrings.DB.ItemTable.POST_TYPE +
-                    this.COMMA + ConstantStrings.DB.ItemTable.REPOSTS +
-                    this.COMMA + ConstantStrings.DB.ItemTable.TEXT +
-                    this.COMMA + ConstantStrings.DB.ItemTable.TYPE +
-                    this.COMMA + ConstantStrings.DB.ItemTable.VIEWS + this.COMMA +
-                    Comments.class.getSimpleName() +
-                    DOT + ConstantStrings.DB.CommnetTable.CAN_POST + SPACE +
-                    this.COMMA + ConstantStrings.DB.CommnetTable.COUNT_COMMENTS + this.COMMA +
-                    Likes.class.getSimpleName() +
-                    DOT + ConstantStrings.DB.LikesTable.CAN_LIKE + SPACE +
-                    this.COMMA + ConstantStrings.DB.LikesTable.COUNT_LIKE + SPACE +
-                    this.COMMA + ConstantStrings.DB.LikesTable.USER_LIKE + this.COMMA +
-                    Reposts.class.getSimpleName() +
-                    DOT + ConstantStrings.DB.RepostsTable.COUNT_REPOST + SPACE +
-                    this.COMMA + ConstantStrings.DB.RepostsTable.USER_REPOST + this.COMMA +
-                    Views.class.getSimpleName() +
-                    DOT + ConstantStrings.DB.ViewsTable.COUNT +
-                    FROM + Item.class.getSimpleName() + INNER_JOIN +
-                    Comments.class.getSimpleName() + ON + OPEN_BRACKET +
-                    Comments.class.getSimpleName() + DOT + ConstantStrings.DB.CommnetTable.COMMENTS_ID + EQUALLY
-                    + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
-                    + INNER_JOIN +
-                    Likes.class.getSimpleName() + ON + OPEN_BRACKET +
-                    Likes.class.getSimpleName() + DOT + ConstantStrings.DB.LikesTable.ID_LIKE + EQUALLY
-                    + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
-                    + INNER_JOIN +
-                    Reposts.class.getSimpleName() + ON + OPEN_BRACKET +
-                    Reposts.class.getSimpleName() + DOT + ConstantStrings.DB.RepostsTable.ID + EQUALLY
-                    + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
-                    + INNER_JOIN +
-                    Views.class.getSimpleName() + ON + OPEN_BRACKET +
-                    Views.class.getSimpleName() + DOT + ConstantStrings.DB.ViewsTable.ID + EQUALLY
-                    + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.POST_ID + CLOSE_BRACKET
-                    + ORDER_BY + Item.class.getSimpleName() + DOT + ConstantStrings.DB.ItemTable.ADDED_AT
-                    + DESC + " limit 50" + END_QUERY;*/
+
             cursor = readable.rawQuery(sql, null);
             Log.d(TAG, "getAllItems: " + sql);
 

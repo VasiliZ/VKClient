@@ -19,7 +19,7 @@ public final class StringUtils {
             final String[] parts = s.split("=");
             if (parts[0].equals(ConstantStrings.ApiVK.CHECK_ACCESS_TOKEN)) {
                 return parts[1];
-            }else {
+            } else {
                 return "";
             }
         }
@@ -27,12 +27,9 @@ public final class StringUtils {
         return null;
     }
 
-    public static String replace(final String pS){
-        return pS.replace("\"", "");
-    }
 
-    public static String getDateFromLong(final long pDate){
-        final Date date = new Date(pDate*1000);
+    public static String getDateFromLong(final long pDate) {
+        final Date date = new Date(pDate * 1000);
         final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         return dateFormat.format(date);
     }

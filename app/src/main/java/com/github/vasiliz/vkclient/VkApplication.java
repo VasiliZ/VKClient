@@ -17,7 +17,6 @@ import com.github.vasiliz.vkclient.base.services.ExecutorDataServiceImpl;
 public class VkApplication extends Application {
 
     private String TAG = VkApplication.class.getSimpleName();
-    private AppDB mAppDB;
     private static ImageLoader mImageLoader;
     private static CreateRequest mCreateRequest;
     private static CreateRequest mLoadMoreNews;

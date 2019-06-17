@@ -35,7 +35,6 @@ public class NewsModel extends IAbstractTask<Object, Response> implements Observ
 
     private final CreateRequest mCreateRequest = VkApplication.getCreateRequest();
     private final CreateRequest mLoadMoreNews = VkApplication.getmLoadMoreNewsApiTemplate();
-    private String ERROR = "error";
 
     public NewsModel(final IDataExecutorService pIDataExecutorService, final String pAccessToken, final IMainPresenter pMainPresenter) {
         super(pIDataExecutorService);
@@ -78,6 +77,7 @@ public class NewsModel extends IAbstractTask<Object, Response> implements Observ
                 byteArrayOutputStream.write(res);
                 res = inputStream.read();
             }
+            final String ERROR = "error";
             if (byteArrayOutputStream.toString().contains(ERROR)) {
                 mIMainPresenter.goToLogin();
                 return null;
@@ -97,7 +97,7 @@ public class NewsModel extends IAbstractTask<Object, Response> implements Observ
     }
 
     @Override
-    public Object merge(Response pResponse) {
+    public Object merge(final Response pResponse) {
         return null;
     }
 
@@ -115,7 +115,7 @@ public class NewsModel extends IAbstractTask<Object, Response> implements Observ
     }
 
     @Override
-    public void postDataBaseExecute(Response pResponse) {
+    public void postDataBaseExecute(final Response pResponse) {
         notifyObservers(pResponse);
     }
 

@@ -16,7 +16,7 @@ public final class VkDBConfig {
         return mContext;
     }
 
-    public String getDbName() {
+    String getDbName() {
         return mDbName;
     }
 
@@ -24,12 +24,8 @@ public final class VkDBConfig {
         return mVersion;
     }
 
-    public SQLiteDatabase.CursorFactory getCursorFactory() {
+    SQLiteDatabase.CursorFactory getCursorFactory() {
         return mCursorFactory;
-    }
-
-    public List<String> getListQueryForCreateTables() {
-        return listQueryForCreateTables;
     }
 
     private VkDBConfig() {

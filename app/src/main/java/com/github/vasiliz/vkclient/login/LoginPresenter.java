@@ -1,7 +1,6 @@
 package com.github.vasiliz.vkclient.login;
 
 import android.arch.lifecycle.Lifecycle;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
